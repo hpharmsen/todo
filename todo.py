@@ -5,8 +5,7 @@ import subprocess
 # - miek
 # - dup
 # - edit
-# - schedule
-# add to git
+# - wat als een day-item met id niet meer bij todoist bestaat?
 
 
 from dayclass import Day, datafolder, priorityActions
@@ -114,31 +113,33 @@ def printPriorities():
 
 
 def printHelp():
-    print( 'todo              - lists todays items')
-    print( 'todo last         - lists last working day')
-    print( 'todo next         - lists next working day')
-    print( 'todo add thingie  - adds thingie to todays list')
-    print( 'todo del 9        - removes item 9')
-    print( 'todo edit 9 blah  - changes text of item to blah')
-    print( 'todo dup 9        - duplicates item 9')
-    print( 'todo high 9       - sets item to high priority')
-    print( 'toto normal 9     - sets item to normal priority')
-    print( 'todo low 9        - sets item to low priority')
-    print( 'todo low thingie  - adds thingie and marks it as low priority')
-    print( 'todo done 9       - marks item as done')
-    print( 'todo done thingie - adds thingie and marks it as done')
-    print( 'todo undone 9     - marks item as undone')
-    print( 'todo push [9]     - moves item or all undone to the next day')
-    print( 'todo pull [9]     - moves item or all undone from previous day to current')
-    print( 'todo pushback [9] - moves item or all undone from previous day to current')
-    print( 'todo today        - prints the day''s file in full')
-    print( 'todo find text    - finds any line with text')
-    print( 'todo meeting text - finds meetings with text in the name')
-    print( 'todo booked       - list hours booked today')
-    print( 'todo note         - opens editor with the current day')
-    print( 'todo ready        - closes day in timesheet and pushes all open items to next day')
-    print( "todo ids          - shows the list with todoist id's")
-    print( 'todo help         - this message\n')
+    print( 'todo                        - lists todays items')
+    print( 'todo last                   - lists last working day')
+    print( 'todo next                   - lists next working day')
+    print( 'todo add thingie            - adds thingie to todays list')
+    print( 'todo del 9                  - removes item 9')
+    print( 'todo edit 9 blah            - changes text of item to blah')
+    print( 'todo dup 9                  - duplicates item 9')
+    print( 'todo high 9                 - sets item to high priority')
+    print( 'toto normal 9               - sets item to normal priority')
+    print( 'todo low 9                  - sets item to low priority')
+    print( 'todo low thingie            - adds thingie and marks it as low priority')
+    print( 'todo done 9                 - marks item as done')
+    print( 'todo done thingie           - adds thingie and marks it as done')
+    print( 'todo undone 9               - marks item as undone')
+    print( 'todo push [9]               - moves item or all undone to the next day')
+    print( 'todo pull [9]               - moves item or all undone from previous day to current')
+    print( 'todo pushback [9]           - moves item or all undone from previous day to current')
+    print( 'todo schedule d/m/[y] 9     - moves item 9 to the specfied day')
+    print( 'todo schedule d/m[/y] thing - adds thing to the specfied day')
+    print( 'todo today                  - prints the day''s file in full')
+    print( 'todo find text              - finds any line with text')
+    print( 'todo meeting text           - finds meetings with text in the name')
+    print( 'todo booked                 - list hours booked today')
+    print( 'todo note                   - opens editor with the current day')
+    print( 'todo ready                  - closes day in timesheet and pushes all open items to next day')
+    print( "todo ids                    - shows the list with todoist id's")
+    print( 'todo help                   - this message\n')
 
 if __name__=='__main__':
     ist = Ist()
@@ -215,6 +216,19 @@ if __name__=='__main__':
             id = day.pushBack( getIntParam() )
             if id:
                 ist.push_back(id)
+
+        elif action=='schedule':
+            date_str = sys.argv[2]
+            if isInt(sys.argv[3]):
+                # syntax: todo schedule d/m[/y] 9
+                id, date = day.reschedule( int(sys.argv[3]), date_str )
+                if id:
+                    ist.reschedule( id, date)
+            else:
+                # syntax: todo schedule d/m[/y] thingie
+                item, date = day.schedule( getTextParam(3), date_str )
+                item['id'] = ist.add_item(item['desc'], item['prio'])
+                ist.reschedule(item['id'], date)
 
         elif action=='next':
             day = Day(getNextDay(day.date))

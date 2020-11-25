@@ -1,5 +1,5 @@
 import datetime
-from settings import datafolder, priorities, getNextDay, getPrevDay
+from settings import datafolder, priorities, getNextDay, getPrevDay, panic
 
 
 class Day:
@@ -182,11 +182,39 @@ class Day:
             lastday.write()
         return changed
 
+    def schedule(self, desc, date_str):
+        date = dmy2ymd(date_str)
+        day = Day( date )
+        item = day.add(desc)
+        day.write()
+        return item, date
+
+    def reschedule(self, num, date_str):
+        item = self.items[num - 1]
+        id = item.get('id')
+        date = dmy2ymd(date_str)
+        day = Day(date)
+        day.add(item['desc'], item['prio'], item.get('id'))
+        day.write()
+        self.delete(num)
+        return id, date
+
     def duplicate( self, num ):
         item = self.items[num-1]
         self.items += [item]
         return item
 
+def dmy2ymd(date_str):
+    y = datetime.datetime.today().strftime('%Y')
+    try:
+        d, m, y = date_str.split('/')
+    except:
+        try:
+            d, m = date_str.split('/')
+        except:
+            panic(f'Invalid date {date_str}. Specify in d/m or d/m/y format')
+    #return datetime.datetime.strptime(f'{y}-{m}-{d}', '%Y-%m-%d')
+    return f'{y}-{m}-{d}'
 
 weekdays = ['Ma','Di','Wo','Do','Vr','Za','Zo']
 monthnames = ['jan','feb','maart','apr','mei','jun','jul','aug','sept','okt','nov','dec']

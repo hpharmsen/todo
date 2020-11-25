@@ -145,8 +145,12 @@ class Ist():
 
     def push_back(self, id):
         prev_day = settings.getPrevDay(datetime.datetime.today()).strftime('%Y-%m-%d')
-        #date_completed = {"string":  "yesterday"}
         self.api.items.complete(id, date_completed=prev_day)
+        self.api.commit()
+
+    def reschedule(self, id, date):
+        due = {"string":  date}
+        self.api.items.update(id, due=due)
         self.api.commit()
 
 if __name__=='__main__':
