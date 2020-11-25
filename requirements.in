@@ -1,0 +1,5 @@
+PyMySQL
+PyYAML
+requests
+todoist-python
+-e git+https://github.com/hpharmsen/hplib#egg=hplib
