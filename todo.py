@@ -2,17 +2,18 @@ import sys, re
 import subprocess
 
 # TODO:
-# - dup
 # - edit
+# - assign
 
 from dayclass import Day, datafolder, priorityActions
 from ist import Ist
 from settings import panic, priorities, getNextDay, getPrevDay
 from timesheet import saveToTimesheet, hoursBookedStatus, getHoursBooked, closeDayInTimesheet
+from item import Item
 
 def isInt( s ):
     try:
-        i = int(s)
+        int(s)
         return 1
     except:
         return 0
@@ -68,6 +69,7 @@ def findText( needle ):
                 print( filepath.name[:-4] + ' ' + line.strip() )
 
 def findMeeting( needle ):
+    title=''
     needle = needle.lower()
     for filepath in data_files():
         with open( filepath ) as f:
@@ -90,13 +92,13 @@ def findMeeting( needle ):
                 status = 'found'
                 title = line.strip()
         if contents:
-            print( "\n=============\n"+filepath.name[:-4] + ' ' + title + "\n---" )
+            print( f"\n=============\n{filepath.name[:-4]} {title}\n---" )
             print( "".join( contents ).strip() )
 
 def push_all(day, ist):
     for item in day.items:
-        if item.get('id') and item['prio'] < 4: # 4 is done
-            ist.push_forward(item['id'])
+        if item.id and item.prio < 4: # 4 is done
+            ist.push_forward(item.id)
     day.pushAllForward()
 
 
@@ -155,8 +157,8 @@ if __name__=='__main__':
             action = 'normal'
 
         if action == 'add':
-            todo_item = day.add( getTextParam() )
-            todo_item['id'] = ist.add_item( todo_item['desc'], todo_item['prio'])
+            todo_item = day.add( Item(getTextParam()) )
+            todo_item.id = ist.add_item( todo_item )
 
         elif action == 'del':
             id = day.delete( getIntParam() )
@@ -164,27 +166,28 @@ if __name__=='__main__':
                 ist.delete_item( id )
 
         elif action == 'dup':
-            day.duplicate( getIntParam() )
+            item = day.duplicate( getIntParam() )
+            item.id = ist.add_item(item)
 
         elif action in priorityActions:
             prio = priorityActions.index(action)
             if isInt( sys.argv[2] ):
                 # syntax: todo high 3
                 item = day.setPriority( getIntParam(), prio )
-                if item.get( 'id'):
-                    ist.set_priority( item['id'], prio )
+                if item.id:
+                    ist.set_priority( item.id, item.ist_prio() )
             else:
                 # syntax: todo low read a boook
                 if getTextParam(2):
-                    item = day.add(priorities[prio] + ' ' + getTextParam(2))
-                    item['id'] = ist.add_item(item['desc'], item['prio'])
+                    item = day.add(Item(getTextParam(2),prio))
+                    item.id = ist.add_item(item)
                 else:
                     # syntax: todo done 3h overleg
-                    item = {'desc':'', 'prio':0} # Special case, only book hours if specified. No todo item.
+                    item = Item('') # Special case, only book hours if specified. No todo item.
 
             if action =='done':
-                if item.get( 'id'):
-                    ist.complete_item( item['id'] )
+                if item.id:
+                    ist.complete_item( item.id )
                 durationtuple = getDurationParam()
                 if durationtuple:
                     # syntax: todo done [4|task description] 3h overleg
@@ -192,7 +195,7 @@ if __name__=='__main__':
                     if not project:
                         panic('Specify project/task. Syntax: todo done 1 3h Sales')
 
-                    saveToTimesheet(project, duration, item['desc'])
+                    saveToTimesheet(project, duration, item.desc)
 
         elif action=='push':
             if len(sys.argv)==3:
@@ -223,8 +226,8 @@ if __name__=='__main__':
             else:
                 # syntax: todo schedule d/m[/y] thingie
                 item, date = day.schedule( getTextParam(3), date_str )
-                item['id'] = ist.add_item(item['desc'], item['prio'])
-                ist.reschedule(item['id'], date)
+                item.id = ist.add_item(item)
+                ist.reschedule(item.id, date)
 
         elif action=='next':
             day = Day(getNextDay(day.date))

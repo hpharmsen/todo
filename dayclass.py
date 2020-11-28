@@ -1,9 +1,11 @@
 import datetime
+
+from item import Item
 from settings import datafolder, priorities, getNextDay, getPrevDay, panic
 
 
 class Day:
-    items = []
+    items = [] # List of Item
     notedata = ''
     date = datetime.date.today()
     originaltext = ''
@@ -59,10 +61,10 @@ class Day:
             else:
                 id = 0
 
-            self.add( line, prio, id )
+            self.add(Item(line, prio, id))
 
     def reorder( self ):
-        self.items.sort( key=lambda a: a['prio'] )
+        self.items.sort( key=lambda a: a.prio )
 
     def write( self ):
         with open( self.path, 'w' ) as f:
@@ -70,7 +72,7 @@ class Day:
 
     def by_id(self):
         # returns a dict of items that have an id != 0. Key of the dict is the id
-        return {item['id']:item for item in self.items if item.get('id')}
+        return {item.id:item for item in self.items if item.id}
 
     ######### Display ############
 
@@ -82,10 +84,11 @@ class Day:
         res = ''
         for i, item in enumerate( self.items, 1 ):
             if display=='screen':
-                if i>1 and self.items[i-2]['prio']!=4 and item['prio']==4:
+                # Empty line between before the done items
+                if i>1 and self.items[i-2].prio!=4 and item.prio==4:
                     res += '\n'
-            id = f" :: {item['id']}" if (display=='file' or show_ids) and item.get('id') else ""
-            res += f"{i:2}. {priorities[item['prio']]} {item['desc']}{id}\n"
+            id = f" :: {item.id}" if (display=='file' or show_ids) and item.id else ""
+            res += f"{i:2}. {item}{id}\n"
         return res
 
     def asText( self ):
@@ -96,37 +99,37 @@ class Day:
 
     ######### Operations ############
 
-    def add( self, desc, prio=-1, id=0 ):
-        if prio==-1:
-            if desc[0] in priorities and desc[1]== ' ':
+    def add( self, item ):
+        if item.prio==-1:
+            if item.desc[0] in priorities and item.desc[1]== ' ':
                 # priority added with the description
-                prio = priorities.index(desc[0])
-                desc = desc[2:]
+                item.prio = priorities.index(item.desc[0])
+                item.desc = item.desc[2:]
             else:
-                prio = 1 # normal
-        newitem = {'desc':desc, 'prio':prio, 'id':id}
-        self.items += [newitem]
-        return newitem
+                item.prio = 1 # normal
+        self.items += [item]
+        return item
 
     def delete( self, num ):
-        id = self.items[num-1].get('id')
+        id = self.items[num-1].id
         del[self.items[num-1]]
         return id
 
     def edit( self, num, newtext ):
         item = self.items[num-1]
-        item['desc'] = newtext
+        item.id = newtext
         return item
 
     def setPriority( self, num, prio ):
         item = self.items[num-1]
-        item['prio'] = prio
+        item.prio = prio
         return item
 
     def pushForward( self, num ):
+        item = self.items[num - 1]
+        id = item.id
         tomorrow = Day(getNextDay(self.date))
-        id = self.items[num - 1].get('id')
-        tomorrow.add( self.items[num-1]['desc'], self.items[num-1]['prio'], id )
+        tomorrow.add( item.dup() )
         tomorrow.write()
         self.delete( num )
         return id
@@ -134,8 +137,9 @@ class Day:
     def pushBack( self, num ):
         item = self.items[num-1]
         id = item.get('id')
+        new_item = Item(item.desc, 4) # 4 is done
         yesterday = Day(getPrevDay(self.date))
-        yesterday.add( item['desc'], 4 ) # 4 is done
+        yesterday.add( new_item )
         yesterday.write()
         self.delete( num )
         return id
@@ -143,14 +147,14 @@ class Day:
     def pushAllForward( self ):
         tomorrow = Day(getNextDay(self.date))
         for item in reversed(self.items):
-            if item['prio'] < 4:
-                tomorrow.add( item['desc'], item['prio'], item.get('id') )
+            if item.prio < 4:
+                tomorrow.add( item.dup() )
                 self.items.remove( item )
         tomorrow.write()
 
     def pullFromLast( self, num ):
         lastday = Day(getPrevDay(self.date))
-        self.add( lastday.items[num-1]['desc'], lastday.items[num-1]['prio'] )
+        self.add( lastday.items[num-1].dup() )
         lastday.delete( num )
         lastday.write()
 
@@ -165,8 +169,8 @@ class Day:
         lastday = Day( date )
         changed = 0
         for item in reversed(lastday.items):
-            if priorities[item['prio']] < 'X':
-                self.add( item['desc'], item['prio'], item.get('id') )
+            if item.prio < 4:
+                self.add( item.dup() )
                 lastday.items.remove( item )
                 changed = 1
         if changed:
@@ -185,13 +189,14 @@ class Day:
         id = item.get('id')
         date = dmy2ymd(date_str)
         day = Day(date)
-        day.add(item['desc'], item['prio'], item.get('id'))
+        day.add(item.dup())
         day.write()
         self.delete(num)
         return id, date
 
     def duplicate( self, num ):
-        item = self.items[num-1]
+        item = self.items[num-1].dup()
+        item.id = 0
         self.items += [item]
         return item
 

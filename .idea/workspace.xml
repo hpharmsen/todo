@@ -71,7 +71,7 @@
         </ENTRIES>
       </EXTENSION>
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/todo.py" />
-      <option name="PARAMETERS" value="" />
+      <option name="PARAMETERS" value="add abc" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -123,63 +123,63 @@
       <screen x="-510" y="-1415" width="2560" height="1415" />
     </state>
     <state x="691" y="-873" key="#Notifications/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606165817829" />
-    <state x="184" y="121" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1606584756799">
+    <state x="184" y="121" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1606594467095">
       <screen x="0" y="25" width="1440" height="875" />
     </state>
     <state x="184" y="121" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.25.1440.875/-510.-1415.2560.1415@0.25.1440.875" timestamp="1606482239565" />
-    <state x="184" y="121" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.25.1440.875@0.25.1440.875" timestamp="1606584756799" />
-    <state x="883" y="215" key="#com.jetbrains.python.refactoring.move.PyMoveModuleMembersDialog" timestamp="1606076494895">
+    <state x="184" y="121" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.25.1440.875@0.25.1440.875" timestamp="1606594467095" />
+    <state x="883" y="215" key="#com.jetbrains.python.refactoring.move.PyMoveModuleMembersDialog" timestamp="1606593204335">
       <screen x="0" y="25" width="1440" height="875" />
     </state>
-    <state x="883" y="215" key="#com.jetbrains.python.refactoring.move.PyMoveModuleMembersDialog/0.25.1440.875@0.25.1440.875" timestamp="1606076494895" />
-    <state width="1419" height="260" key="GridCell.Tab.0.bottom" timestamp="1606584761452">
+    <state x="883" y="215" key="#com.jetbrains.python.refactoring.move.PyMoveModuleMembersDialog/0.25.1440.875@0.25.1440.875" timestamp="1606593204335" />
+    <state width="1419" height="260" key="GridCell.Tab.0.bottom" timestamp="1606594727478">
       <screen x="0" y="25" width="1440" height="875" />
     </state>
     <state width="2438" height="451" key="GridCell.Tab.0.bottom/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606485479603" />
     <state width="1419" height="260" key="GridCell.Tab.0.bottom/0.25.1440.875/-510.-1415.2560.1415@0.25.1440.875" timestamp="1606482242432" />
-    <state width="1419" height="260" key="GridCell.Tab.0.bottom/0.25.1440.875@0.25.1440.875" timestamp="1606584761452" />
-    <state width="1419" height="260" key="GridCell.Tab.0.center" timestamp="1606584761452">
+    <state width="1419" height="260" key="GridCell.Tab.0.bottom/0.25.1440.875@0.25.1440.875" timestamp="1606594727478" />
+    <state width="1419" height="260" key="GridCell.Tab.0.center" timestamp="1606594727478">
       <screen x="0" y="25" width="1440" height="875" />
     </state>
     <state width="2438" height="451" key="GridCell.Tab.0.center/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606485479603" />
     <state width="1419" height="260" key="GridCell.Tab.0.center/0.25.1440.875/-510.-1415.2560.1415@0.25.1440.875" timestamp="1606482242430" />
-    <state width="1419" height="260" key="GridCell.Tab.0.center/0.25.1440.875@0.25.1440.875" timestamp="1606584761452" />
-    <state width="1419" height="260" key="GridCell.Tab.0.left" timestamp="1606584761452">
+    <state width="1419" height="260" key="GridCell.Tab.0.center/0.25.1440.875@0.25.1440.875" timestamp="1606594727478" />
+    <state width="1419" height="260" key="GridCell.Tab.0.left" timestamp="1606594727477">
       <screen x="0" y="25" width="1440" height="875" />
     </state>
     <state width="2438" height="451" key="GridCell.Tab.0.left/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606485479603" />
     <state width="1419" height="260" key="GridCell.Tab.0.left/0.25.1440.875/-510.-1415.2560.1415@0.25.1440.875" timestamp="1606482242429" />
-    <state width="1419" height="260" key="GridCell.Tab.0.left/0.25.1440.875@0.25.1440.875" timestamp="1606584761452" />
-    <state width="1419" height="260" key="GridCell.Tab.0.right" timestamp="1606584761452">
+    <state width="1419" height="260" key="GridCell.Tab.0.left/0.25.1440.875@0.25.1440.875" timestamp="1606594727477" />
+    <state width="1419" height="260" key="GridCell.Tab.0.right" timestamp="1606594727478">
       <screen x="0" y="25" width="1440" height="875" />
     </state>
     <state width="2438" height="451" key="GridCell.Tab.0.right/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606485479603" />
     <state width="1419" height="260" key="GridCell.Tab.0.right/0.25.1440.875/-510.-1415.2560.1415@0.25.1440.875" timestamp="1606482242431" />
-    <state width="1419" height="260" key="GridCell.Tab.0.right/0.25.1440.875@0.25.1440.875" timestamp="1606584761452" />
-    <state width="1419" height="260" key="GridCell.Tab.1.bottom" timestamp="1606584762756">
+    <state width="1419" height="260" key="GridCell.Tab.0.right/0.25.1440.875@0.25.1440.875" timestamp="1606594727478" />
+    <state width="1419" height="260" key="GridCell.Tab.1.bottom" timestamp="1606594727407">
       <screen x="0" y="25" width="1440" height="875" />
     </state>
     <state width="2438" height="451" key="GridCell.Tab.1.bottom/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606485479604" />
     <state width="1419" height="260" key="GridCell.Tab.1.bottom/0.25.1440.875/-510.-1415.2560.1415@0.25.1440.875" timestamp="1606482243421" />
-    <state width="1419" height="260" key="GridCell.Tab.1.bottom/0.25.1440.875@0.25.1440.875" timestamp="1606584762756" />
-    <state width="1419" height="260" key="GridCell.Tab.1.center" timestamp="1606584762755">
+    <state width="1419" height="260" key="GridCell.Tab.1.bottom/0.25.1440.875@0.25.1440.875" timestamp="1606594727407" />
+    <state width="1419" height="260" key="GridCell.Tab.1.center" timestamp="1606594727407">
       <screen x="0" y="25" width="1440" height="875" />
     </state>
     <state width="2438" height="451" key="GridCell.Tab.1.center/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606485479604" />
     <state width="1419" height="260" key="GridCell.Tab.1.center/0.25.1440.875/-510.-1415.2560.1415@0.25.1440.875" timestamp="1606482243420" />
-    <state width="1419" height="260" key="GridCell.Tab.1.center/0.25.1440.875@0.25.1440.875" timestamp="1606584762755" />
-    <state width="1419" height="260" key="GridCell.Tab.1.left" timestamp="1606584762755">
+    <state width="1419" height="260" key="GridCell.Tab.1.center/0.25.1440.875@0.25.1440.875" timestamp="1606594727407" />
+    <state width="1419" height="260" key="GridCell.Tab.1.left" timestamp="1606594727406">
       <screen x="0" y="25" width="1440" height="875" />
     </state>
     <state width="2438" height="451" key="GridCell.Tab.1.left/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606485479604" />
     <state width="1419" height="260" key="GridCell.Tab.1.left/0.25.1440.875/-510.-1415.2560.1415@0.25.1440.875" timestamp="1606482243419" />
-    <state width="1419" height="260" key="GridCell.Tab.1.left/0.25.1440.875@0.25.1440.875" timestamp="1606584762755" />
-    <state width="1419" height="260" key="GridCell.Tab.1.right" timestamp="1606584762756">
+    <state width="1419" height="260" key="GridCell.Tab.1.left/0.25.1440.875@0.25.1440.875" timestamp="1606594727406" />
+    <state width="1419" height="260" key="GridCell.Tab.1.right" timestamp="1606594727407">
       <screen x="0" y="25" width="1440" height="875" />
     </state>
     <state width="2438" height="451" key="GridCell.Tab.1.right/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606485479604" />
     <state width="1419" height="260" key="GridCell.Tab.1.right/0.25.1440.875/-510.-1415.2560.1415@0.25.1440.875" timestamp="1606482243420" />
-    <state width="1419" height="260" key="GridCell.Tab.1.right/0.25.1440.875@0.25.1440.875" timestamp="1606584762756" />
+    <state width="1419" height="260" key="GridCell.Tab.1.right/0.25.1440.875@0.25.1440.875" timestamp="1606594727407" />
     <state x="-103" y="-1297" key="SettingsEditor" timestamp="1606165906251">
       <screen x="-510" y="-1415" width="2560" height="1415" />
     </state>
@@ -189,6 +189,10 @@
       <screen x="0" y="25" width="1440" height="875" />
     </state>
     <state width="720" height="437" key="XDebugger.FullValuePopup/0.25.1440.875@0.25.1440.875" timestamp="1606249128528" />
+    <state x="276" y="202" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1606594564137">
+      <screen x="0" y="25" width="1440" height="875" />
+    </state>
+    <state x="276" y="202" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.25.1440.875@0.25.1440.875" timestamp="1606594564137" />
     <state x="421" y="217" width="597" height="490" key="find.popup" timestamp="1605969129781">
       <screen x="0" y="25" width="1440" height="875" />
     </state>
@@ -196,13 +200,18 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <default-breakpoints>
-        <breakpoint type="python-exception">
-          <properties notifyOnTerminate="true" exception="BaseException">
-            <option name="notifyOnTerminate" value="true" />
-          </properties>
-        </breakpoint>
-      </default-breakpoints>
+      <breakpoints>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ist.py</url>
+          <line>142</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/dayclass.py</url>
+          <line>102</line>
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+      </breakpoints>
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">

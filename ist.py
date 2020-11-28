@@ -4,6 +4,7 @@ from collections import defaultdict
 import requests
 import todoist
 import settings
+from item import Item
 
 TODAY = datetime.datetime.now().strftime( '%Y-%m-%d')
 
@@ -14,13 +15,6 @@ TODAY = datetime.datetime.now().strftime( '%Y-%m-%d')
 # In todoist
 # 1 = low, 2 = miek, 3 = normal, 4 = high
 
-def todo2istprio( prio ):
-    # 0 -> 4
-    # 1 -> 3
-    # 2 -> 1
-    # 3 -> 2 and Assign to someone else
-    # 4 -> Set to done
-    return {0:4, 1:3, 2:1, 3:2, 4:4}[prio]
 
 def ist2todoprio( prio, date_completed ):
     # 1 -> 2 low
@@ -61,7 +55,7 @@ class Ist():
                     continue
 
             # If specified filter out all items not belonging to the project.
-            if project and item['project_id'] != project['id']:
+            if project and item['project_id'] != project.id:
                 continue
 
             # Filter out deleted items
@@ -86,7 +80,7 @@ class Ist():
 
     def project_by_id(self, project_id):
         for project in self.projects():
-            if project['id'] == project_id:
+            if project.id == project_id:
                 return project
 
     def sync(self, day):
@@ -95,31 +89,30 @@ class Ist():
         todoist_ids = set()
         for todoist_item in todoist_items:
             title = todoist_item.data['content']
-            prio = ist2todoprio(todoist_item.data['priority'],todoist_item.data['date_completed'],)
+            prio = ist2todoprio(todoist_item.data['priority'], todoist_item.data['date_completed'],)
             id = todoist_item.data['id']
             todoist_ids.add( id )
             day_item = day_dict.get(id)
             if not day_item:
                 # todoist item not found in day. Add it
-                day_item = day.add( title, prio, id )
+                day_item = day.add( Item(title, prio, id) )
             # Update if Todoist item appears to have changed
-            if day_item['prio'] != prio:
-                day_item['prio'] = prio
-            if day_item['desc'] != title:
-                day_item['dec'] = title
+            if day_item.prio != prio:
+                day_item.prio = prio
+            if day_item.desc != title:
+                day_item.desc = title
 
         for day_item in day.items:
-            id = day_item.get('id')
-            if id:
-                if not id in todoist_ids:
+            if day_item.id:
+                if not day_item.id in todoist_ids:
                     # Item has an id so used to be in todoist but isn't there anymore. Delete it.
                     day.items.remove( day_item )
             else:
                 # No id, must be a new item. Add it to todoist
-                item = self.api.add_item( day_item['desc'])
-                self.api.items.update(item['id'], priority=day_item['prio'])
+                item = self.api.add_item( day_item.desc)
+                self.api.items.update(item.id, priority=day_item.ist_prio())
                 self.api.commit()
-                day_item['id'] = item['id']
+                day_item.id = item.id
 
     def __str__(self):
         projects = defaultdict(list)
@@ -143,9 +136,9 @@ class Ist():
 
     ### ACTIONS ###
 
-    def add_item(self, content, prio):
-        converted_prio = todo2istprio(prio)
-        new = self.api.add_item(content, priority=converted_prio)
+    def add_item(self, item):
+        i = item.ist_prio()
+        new = self.api.add_item(item.desc, priority=item.ist_prio())
         self.api.commit()
         return new['id']
 
@@ -160,9 +153,8 @@ class Ist():
         self.api.items.archive(id)
         self.api.commit()
 
-    def set_priority(self, id, prio):
-        prio = todo2istprio(prio)
-        self.api.items.update(id, priority=prio)
+    def set_priority(self, id, priority):
+        self.api.items.update(id, priority=priority)
         self.api.commit()
 
     def push_forward(self, id):
