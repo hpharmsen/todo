@@ -2,11 +2,8 @@ import sys, re
 import subprocess
 
 # TODO:
-# - miek
 # - dup
 # - edit
-# - wat als een day-item met id niet meer bij todoist bestaat?
-
 
 from dayclass import Day, datafolder, priorityActions
 from ist import Ist
@@ -19,7 +16,6 @@ def isInt( s ):
         return 1
     except:
         return 0
-
 
 def getIntParam():
     try:

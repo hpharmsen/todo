@@ -17,7 +17,6 @@ class Day:
         self.originaltext = ''
         self._dailyNotesBook = None
 
-        #self.path = datafolder /  self.date.strftime( '%Y-%m-%d' ) + '.txt'
         self.path = datafolder /  f'{self.date}.txt'
 
         self.read()
@@ -26,12 +25,6 @@ class Day:
         if not self.path.is_file():
             return
 
-        #filetime = time.localtime( os.stat(self.filename())[8] )
-
-        #note = None
-        #if note and time.localtime( note.updated/1000 ) > filetime:
-        #    self.originaltext = parseNote( note ).replace('<br/>',"\n")
-        #else:
         with open( self.path ) as f:
             self.originaltext = f.read()
 
@@ -87,7 +80,6 @@ class Day:
 
     def asStrings( self, display='file', show_ids=False ):
         res = ''
-        #for i in range(len(self.items)):
         for i, item in enumerate( self.items, 1 ):
             if display=='screen':
                 if i>1 and self.items[i-2]['prio']!=4 and item['prio']==4:
@@ -152,7 +144,7 @@ class Day:
         tomorrow = Day(getNextDay(self.date))
         for item in reversed(self.items):
             if item['prio'] < 4:
-                tomorrow.add( item['desc'], item['prio'] )
+                tomorrow.add( item['desc'], item['prio'], item.get('id') )
                 self.items.remove( item )
         tomorrow.write()
 
@@ -163,7 +155,6 @@ class Day:
         lastday.write()
 
     def pullAll( self ):
-        lastday = Day( self.date )
         changed = False
         date = self.date
         for days in range( 10 ):
@@ -175,7 +166,7 @@ class Day:
         changed = 0
         for item in reversed(lastday.items):
             if priorities[item['prio']] < 'X':
-                self.add( item['desc'], item['prio'] )
+                self.add( item['desc'], item['prio'], item.get('id') )
                 lastday.items.remove( item )
                 changed = 1
         if changed:
@@ -213,7 +204,6 @@ def dmy2ymd(date_str):
             d, m = date_str.split('/')
         except:
             panic(f'Invalid date {date_str}. Specify in d/m or d/m/y format')
-    #return datetime.datetime.strptime(f'{y}-{m}-{d}', '%Y-%m-%d')
     return f'{y}-{m}-{d}'
 
 weekdays = ['Ma','Di','Wo','Do','Vr','Za','Zo']

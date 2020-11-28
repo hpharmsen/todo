@@ -1,5 +1,4 @@
 import datetime
-
 import settings
 from settings import panic
 
@@ -10,19 +9,7 @@ def getDB():
     if db:  # Singleton
         return db
 
-    #dbhost = inifile.get( 'timesheet', 'dbhost' )
-    #dbname = inifile.get( 'timesheet', 'dbname' )
-    #dbuser = inifile.get( 'timesheet', 'dbuser' )
-    #dbpass = inifile.get( 'timesheet', 'dbpass' )
-
     from hplib.dbclass import dbClass
-
-
-    #db = dbClass(dbhost, dbname, dbuser, dbpass )
-    #try:
-    #    db = dbClass(dbhost, dbname, dbuser, dbpass )
-    #except:
-    #    panic( 'db connection error' )
 
     try:
         return dbClass.from_inifile(settings.scriptpath / 'localtodo.ini')
@@ -66,7 +53,6 @@ def saveToTimesheet( project, duration, comment='' ):
         for t in tasks:
             print( t['taskid'], t['taskname'] )
         panic('')
-    #DayAction = 0
 
     task = tasks[0]
     if task['taskid']=='':
@@ -75,7 +61,6 @@ def saveToTimesheet( project, duration, comment='' ):
     db = getDB()
     if not db:
         return
-    #db.debug = 1
     user = settings.timesheetuser
     today = datetime.datetime.now().strftime('%Y/%m/%d')
     now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -86,7 +71,6 @@ def saveToTimesheet( project, duration, comment='' ):
         valuedict = {'hours': duration, 'comment':comment, 'lastchange':now }
         insertdict = wheredict.copy()
         insertdict.update(valuedict)
-        #db.debug=1
         db.insert( 'timesheet', insertdict )
     else:
         if not alreadybooked[0]['comment']:
