@@ -136,7 +136,7 @@ class Day:
 
     def pushBack( self, num ):
         item = self.items[num-1]
-        id = item.get('id')
+        id = item.id
         new_item = Item(item.desc, 4) # 4 is done
         yesterday = Day(getPrevDay(self.date))
         yesterday.add( new_item )
@@ -186,7 +186,7 @@ class Day:
 
     def reschedule(self, num, date_str):
         item = self.items[num - 1]
-        id = item.get('id')
+        id = item.id
         date = dmy2ymd(date_str)
         day = Day(date)
         day.add(item.dup())

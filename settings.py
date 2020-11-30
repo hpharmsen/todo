@@ -1,7 +1,7 @@
 import datetime
 import sys
 from pathlib import Path
-from backports.configparser import ConfigParser
+from configparser import ConfigParser
 
 scriptpath = Path(__file__).resolve().parent
 inifile = ConfigParser()
