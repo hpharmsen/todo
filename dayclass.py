@@ -117,7 +117,7 @@ class Day:
 
     def edit( self, num, newtext ):
         item = self.items[num-1]
-        item.id = newtext
+        item.desc = newtext
         return item
 
     def setPriority( self, num, prio ):

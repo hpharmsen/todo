@@ -142,15 +142,19 @@ class Ist():
         self.api.commit()
         return new['id']
 
-    def delete_item(self, id):
-        self.api.items.delete(id)
-        self.api.commit()
-
     def complete_item(self, id):
         date_completed = datetime.datetime.today().strftime('%Y-%m-%d')
 
         self.api.items.complete(id, date_completed=date_completed)
         self.api.items.archive(id)
+        self.api.commit()
+
+    def delete_item(self, id):
+        self.api.items.delete(id)
+        self.api.commit()
+
+    def edit_item(self, id, new_text):
+        self.api.items.update(id, content=new_text)
         self.api.commit()
 
     def set_priority(self, id, priority):

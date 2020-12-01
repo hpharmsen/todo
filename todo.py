@@ -2,7 +2,6 @@ import sys, re
 import subprocess
 
 # TODO:
-# - edit
 # - assign
 
 from dayclass import Day, datafolder, priorityActions
@@ -236,7 +235,10 @@ if __name__=='__main__':
             day = Day(getPrevDay(day.date))
 
         elif action == 'edit':
-            day.edit( getIntParam(), getTextParam( 3 ) )
+            num = getIntParam()
+            new_text = getTextParam( 3 )
+            item = day.edit( num, new_text )
+            ist.edit_item( item.id, new_text )
 
         elif action == 'today':
             print( day.asText() )
