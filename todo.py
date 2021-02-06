@@ -8,9 +8,8 @@ import subprocess
 from dayclass import Day, datafolder, priorityActions
 from ist import Ist # todoist
 from settings import panic, getNextDay, getPrevDay
-#from timesheet import saveToTimesheet, hoursBookedStatus, getHoursBooked, closeDayInTimesheet
 from item import Item
-from simplicate import book, hoursBookedStatus, getHoursBooked
+from simplicate import book, hours_booked_status, hours_booked, approve_hours
 
 def isInt( s ):
     try:
@@ -107,8 +106,8 @@ def push_all(day, ist):
 
 
 def printHoursBooked():
-    for line in getHoursBooked():
-        print( '{booked:0.2f} {project}, {task} - {note}'.format(**line) )
+    lines = ['{booked:0.2f} {project}, {task} - {note}'.format(**line) for line in hours_booked()]
+    print('\n'.join( sorted(lines)))
         
 def printPriorities():
     pass
@@ -268,14 +267,14 @@ if __name__=='__main__':
 
         elif action == 'booked':
             printHoursBooked()
-            print(hoursBookedStatus())
+            print(hours_booked_status())
             DayAction = False
 
         elif action == 'note':
             subprocess.run(['open', day.path], check=True)
 
         elif action == 'ready':
-            closeDayInTimesheet()
+            approve_hours()
             push_all(day, ist)
 
         elif action == 'ids':
@@ -310,5 +309,5 @@ if __name__=='__main__':
         if day.originaltext != day.asText():
             day.write()
 
-        print(hoursBookedStatus())
+        print(hours_booked_status())
 
