@@ -14,6 +14,14 @@
       </list>
     </option>
   </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
   <component name="ProjectId" id="1jHJ8hWjSevzCEm9oZd6eTHOTiI" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -26,7 +34,7 @@
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
   </component>
-  <component name="RunManager" selected="Python.todo">
+  <component name="RunManager" selected="Python.simplicate">
     <configuration name="ist" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="todo" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -40,6 +48,27 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ist.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="simplicate" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="todo" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/simplicate.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -71,7 +100,7 @@
         </ENTRIES>
       </EXTENSION>
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/todo.py" />
-      <option name="PARAMETERS" value="edit 1 test 2" />
+      <option name="PARAMETERS" value="done Test 1h next" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -82,9 +111,11 @@
     <list>
       <item itemvalue="Python.ist" />
       <item itemvalue="Python.todo" />
+      <item itemvalue="Python.simplicate" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.simplicate" />
         <item itemvalue="Python.todo" />
         <item itemvalue="Python.ist" />
       </list>
@@ -118,92 +149,12 @@
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
   </component>
-  <component name="WindowStateProjectService">
-    <state x="691" y="-873" key="#Notifications" timestamp="1606165817829">
-      <screen x="-510" y="-1415" width="2560" height="1415" />
-    </state>
-    <state x="691" y="-873" key="#Notifications/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606165817829" />
-    <state x="184" y="121" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1606860714748">
-      <screen x="0" y="25" width="1440" height="875" />
-    </state>
-    <state x="184" y="121" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.25.1440.875/-510.-1415.2560.1415@0.25.1440.875" timestamp="1606756663709" />
-    <state x="184" y="121" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.25.1440.875@0.25.1440.875" timestamp="1606860714748" />
-    <state x="883" y="215" key="#com.jetbrains.python.refactoring.move.PyMoveModuleMembersDialog" timestamp="1606593204335">
-      <screen x="0" y="25" width="1440" height="875" />
-    </state>
-    <state x="883" y="215" key="#com.jetbrains.python.refactoring.move.PyMoveModuleMembersDialog/0.25.1440.875@0.25.1440.875" timestamp="1606593204335" />
-    <state width="1419" height="260" key="GridCell.Tab.0.bottom" timestamp="1606860851152">
-      <screen x="0" y="25" width="1440" height="875" />
-    </state>
-    <state width="2438" height="451" key="GridCell.Tab.0.bottom/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606485479603" />
-    <state width="1419" height="260" key="GridCell.Tab.0.bottom/0.25.1440.875/-510.-1415.2560.1415@0.25.1440.875" timestamp="1606756673339" />
-    <state width="1419" height="260" key="GridCell.Tab.0.bottom/0.25.1440.875@0.25.1440.875" timestamp="1606860851152" />
-    <state width="1419" height="260" key="GridCell.Tab.0.center" timestamp="1606860851152">
-      <screen x="0" y="25" width="1440" height="875" />
-    </state>
-    <state width="2438" height="451" key="GridCell.Tab.0.center/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606485479603" />
-    <state width="1419" height="260" key="GridCell.Tab.0.center/0.25.1440.875/-510.-1415.2560.1415@0.25.1440.875" timestamp="1606756673337" />
-    <state width="1419" height="260" key="GridCell.Tab.0.center/0.25.1440.875@0.25.1440.875" timestamp="1606860851152" />
-    <state width="1419" height="260" key="GridCell.Tab.0.left" timestamp="1606860851151">
-      <screen x="0" y="25" width="1440" height="875" />
-    </state>
-    <state width="2438" height="451" key="GridCell.Tab.0.left/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606485479603" />
-    <state width="1419" height="260" key="GridCell.Tab.0.left/0.25.1440.875/-510.-1415.2560.1415@0.25.1440.875" timestamp="1606756673335" />
-    <state width="1419" height="260" key="GridCell.Tab.0.left/0.25.1440.875@0.25.1440.875" timestamp="1606860851151" />
-    <state width="1419" height="260" key="GridCell.Tab.0.right" timestamp="1606860851152">
-      <screen x="0" y="25" width="1440" height="875" />
-    </state>
-    <state width="2438" height="451" key="GridCell.Tab.0.right/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606485479603" />
-    <state width="1419" height="260" key="GridCell.Tab.0.right/0.25.1440.875/-510.-1415.2560.1415@0.25.1440.875" timestamp="1606756673338" />
-    <state width="1419" height="260" key="GridCell.Tab.0.right/0.25.1440.875@0.25.1440.875" timestamp="1606860851152" />
-    <state width="1419" height="260" key="GridCell.Tab.1.bottom" timestamp="1606860852542">
-      <screen x="0" y="25" width="1440" height="875" />
-    </state>
-    <state width="2438" height="451" key="GridCell.Tab.1.bottom/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606485479604" />
-    <state width="1419" height="260" key="GridCell.Tab.1.bottom/0.25.1440.875/-510.-1415.2560.1415@0.25.1440.875" timestamp="1606756675074" />
-    <state width="1419" height="260" key="GridCell.Tab.1.bottom/0.25.1440.875@0.25.1440.875" timestamp="1606860852542" />
-    <state width="1419" height="260" key="GridCell.Tab.1.center" timestamp="1606860852541">
-      <screen x="0" y="25" width="1440" height="875" />
-    </state>
-    <state width="2438" height="451" key="GridCell.Tab.1.center/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606485479604" />
-    <state width="1419" height="260" key="GridCell.Tab.1.center/0.25.1440.875/-510.-1415.2560.1415@0.25.1440.875" timestamp="1606756675072" />
-    <state width="1419" height="260" key="GridCell.Tab.1.center/0.25.1440.875@0.25.1440.875" timestamp="1606860852541" />
-    <state width="1419" height="260" key="GridCell.Tab.1.left" timestamp="1606860852540">
-      <screen x="0" y="25" width="1440" height="875" />
-    </state>
-    <state width="2438" height="451" key="GridCell.Tab.1.left/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606485479604" />
-    <state width="1419" height="260" key="GridCell.Tab.1.left/0.25.1440.875/-510.-1415.2560.1415@0.25.1440.875" timestamp="1606756675072" />
-    <state width="1419" height="260" key="GridCell.Tab.1.left/0.25.1440.875@0.25.1440.875" timestamp="1606860852540" />
-    <state width="1419" height="260" key="GridCell.Tab.1.right" timestamp="1606860852542">
-      <screen x="0" y="25" width="1440" height="875" />
-    </state>
-    <state width="2438" height="451" key="GridCell.Tab.1.right/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606485479604" />
-    <state width="1419" height="260" key="GridCell.Tab.1.right/0.25.1440.875/-510.-1415.2560.1415@0.25.1440.875" timestamp="1606756675073" />
-    <state width="1419" height="260" key="GridCell.Tab.1.right/0.25.1440.875@0.25.1440.875" timestamp="1606860852542" />
-    <state x="-103" y="-1297" key="SettingsEditor" timestamp="1606165906251">
-      <screen x="-510" y="-1415" width="2560" height="1415" />
-    </state>
-    <state x="-103" y="-1297" key="SettingsEditor/0.25.1440.875/-510.-1415.2560.1415@-510.-1415.2560.1415" timestamp="1606165906251" />
-    <state x="229" y="98" key="SettingsEditor/0.25.1440.875@0.25.1440.875" timestamp="1605736263053" />
-    <state width="720" height="437" key="XDebugger.FullValuePopup" timestamp="1606249128528">
-      <screen x="0" y="25" width="1440" height="875" />
-    </state>
-    <state width="720" height="437" key="XDebugger.FullValuePopup/0.25.1440.875@0.25.1440.875" timestamp="1606249128528" />
-    <state x="276" y="202" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1606594564137">
-      <screen x="0" y="25" width="1440" height="875" />
-    </state>
-    <state x="276" y="202" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.25.1440.875@0.25.1440.875" timestamp="1606594564137" />
-    <state x="421" y="217" width="597" height="490" key="find.popup" timestamp="1605969129781">
-      <screen x="0" y="25" width="1440" height="875" />
-    </state>
-    <state x="421" y="217" width="597" height="490" key="find.popup/0.25.1440.875@0.25.1440.875" timestamp="1605969129781" />
-  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/ist.py</url>
-          <line>142</line>
+          <line>153</line>
           <option name="timeStamp" value="15" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">

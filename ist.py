@@ -33,6 +33,7 @@ class Ist():
             self.api.sync()
         except requests.exceptions.ConnectionError:
             return None # Network
+        self.projects = self.get_projects()
 
     def items(self, project=None, scheduled=False, deleted=False, completed_today=True):
         items = []
@@ -54,6 +55,14 @@ class Ist():
                 else:
                     continue
 
+            # Filter out items from shared projects that are not assigned to nor assigned by me
+
+            own_projects = [p['id'] for p in self.projects if not p['shared']]
+            if not item['project_id'] in own_projects and \
+               item['responsible_uid'] != settings.todoist_user_id and \
+               item['assigned_by_uid'] != settings.todoist_user_id:
+                continue
+
             # If specified filter out all items not belonging to the project.
             if project and item['project_id'] != project.id:
                 continue
@@ -70,16 +79,16 @@ class Ist():
 
         return items
 
-    def projects(self):
+    def get_projects(self):
         return self.api.state['projects']
 
     def project_by_name(self, project_name):
-        for project in self.projects():
+        for project in self.projects:
             if project['name'] == project_name:
                 return project
 
     def project_by_id(self, project_id):
-        for project in self.projects():
+        for project in self.projects:
             if project.id == project_id:
                 return project
 
@@ -91,6 +100,8 @@ class Ist():
             title = todoist_item.data['content']
             prio = ist2todoprio(todoist_item.data['priority'], todoist_item.data['date_completed'],)
             id = todoist_item.data['id']
+            if id == 4369327690:
+                continue # Ghost id that cannot be found or deleted in todoist
             todoist_ids.add( id )
             day_item = day_dict.get(id)
             if not day_item:
@@ -160,6 +171,7 @@ class Ist():
     def set_priority(self, id, priority):
         self.api.items.update(id, priority=priority)
         self.api.commit()
+
 
     def push_forward(self, id):
         due = {"string":  "tomorrow"}

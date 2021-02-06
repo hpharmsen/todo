@@ -83,31 +83,6 @@ def saveToTimesheet( project, duration, comment='' ):
     print( 'Booked ', duration, 'hours on task', task['taskname'] )
 
 
-def hoursBookedStatus():
-    user = settings.timesheetuser
-    db = getDB()
-    if not db:
-        return ''
-    res = db.execute(f"SELECT sum(hours) as booked from timesheet where user='{user}' and day=curdate()")
-    booked = res and res[0]['booked'] or 0
-    now = datetime.datetime.now()
-    weekday = now.weekday()
-    if weekday >= 5: # zo za
-        return ''
-    elif weekday == 2: # wo
-        start_hour = 8
-    else:
-        start_hour = 9
-    lunch = now.hour>=12 and 30*60 or 0
-    start_time = datetime.datetime( now.year, now.month, now.day, start_hour, 30 )
-    s =  '{:0.2f} booked'.format( booked )
-    if now>start_time:
-        time_passed = now - start_time
-        missing = (((time_passed.seconds-lunch) * 4)  / 3600 - 4* booked) / 4.0
-        if missing>=0.5:
-            s += ', {:0.2f} hours missing'.format( missing )
-    return s
-
 
 def getHoursBooked():
     user = settings.timesheetuser
@@ -121,5 +96,8 @@ def closeDayInTimesheet():
     db = getDB()
     user = settings.timesheetuser
     today = datetime.date.today().strftime( '%Y-%m-%d' )
-    db.insert( 'timesheetcompleted', {'user':user, 'day':today} )
-    db.commit()
+    try:
+        db.insert( 'timesheetcompleted', {'user':user, 'day':today} )
+        db.commit()
+    except:
+        pass

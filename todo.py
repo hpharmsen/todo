@@ -2,13 +2,15 @@ import sys, re
 import subprocess
 
 # TODO:
-# - assign
+# - assign to specific person
+# - Do not sync items from shared todoist projects that are not assigned to me nor assigned by me
 
 from dayclass import Day, datafolder, priorityActions
-from ist import Ist
-from settings import panic, priorities, getNextDay, getPrevDay
-from timesheet import saveToTimesheet, hoursBookedStatus, getHoursBooked, closeDayInTimesheet
+from ist import Ist # todoist
+from settings import panic, getNextDay, getPrevDay
+#from timesheet import saveToTimesheet, hoursBookedStatus, getHoursBooked, closeDayInTimesheet
 from item import Item
+from simplicate import book, hoursBookedStatus, getHoursBooked
 
 def isInt( s ):
     try:
@@ -97,13 +99,16 @@ def findMeeting( needle ):
 def push_all(day, ist):
     for item in day.items:
         if item.id and item.prio < 4: # 4 is done
-            ist.push_forward(item.id)
+            try:
+                ist.push_forward(item.id)
+            except:
+                pass # Er is dan wel iets raars aan de hand
     day.pushAllForward()
 
 
 def printHoursBooked():
     for line in getHoursBooked():
-        print( '{project}, {task}, {booked:0.2f}'.format(**line) )
+        print( '{booked:0.2f} {project}, {task} - {note}'.format(**line) )
         
 def printPriorities():
     pass
@@ -174,7 +179,14 @@ if __name__=='__main__':
                 # syntax: todo high 3
                 item = day.setPriority( getIntParam(), prio )
                 if item.id:
-                    ist.set_priority( item.id, item.ist_prio() )
+                    try:
+                        ist.set_priority( item.id, item.ist_prio() )
+                    except Exception as e:
+                        if item.ist_prio() == 4:
+                            pass
+                        else:
+                            raise e
+
             else:
                 # syntax: todo low read a boook
                 if getTextParam(2):
@@ -186,7 +198,10 @@ if __name__=='__main__':
 
             if action =='done':
                 if item.id:
-                    ist.complete_item( item.id )
+                    try:
+                        ist.complete_item( item.id )
+                    except:
+                        pass # Is toch done dus who cares
                 durationtuple = getDurationParam()
                 if durationtuple:
                     # syntax: todo done [4|task description] 3h overleg
@@ -194,8 +209,8 @@ if __name__=='__main__':
                     if not project:
                         panic('Specify project/task. Syntax: todo done 1 3h Sales')
 
-                    saveToTimesheet(project, duration, item.desc)
-
+                    if not book(project, duration, item.desc):
+                        sys.exit()
         elif action=='push':
             if len(sys.argv)==3:
                 id = day.pushForward( getIntParam() )
@@ -263,7 +278,6 @@ if __name__=='__main__':
             closeDayInTimesheet()
             push_all(day, ist)
 
-
         elif action == 'ids':
             # Show the todo list with todoist id's
             show_ids = True
@@ -282,7 +296,8 @@ if __name__=='__main__':
                 panic('Specify project/task. Syntax: todo log Offerte maken 3h Sales')
 
             comment = getTextParam()
-            saveToTimesheet(project, duration, comment)
+            if not book(project, duration, comment):
+                sys.exit()
             DayAction = 0
 
         else:
