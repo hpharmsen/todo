@@ -68,12 +68,8 @@ def hours_booked_status():
     weekday = now.weekday()
     if weekday >= 5: # zo za
         return ''
-    elif weekday == 2: # wo
-        start_hour = 8
-    else:
-        start_hour = 9
     lunch = now.hour>=12 and 30*60 or 0
-    start_time = datetime.datetime( now.year, now.month, now.day, start_hour, 30 )
+    start_time = datetime.datetime( now.year, now.month, now.day, 9, 30 )
     s =  '{:0.2f} booked'.format( booked )
     if now>start_time:
         time_passed = now - start_time
@@ -92,7 +88,8 @@ def hours_booked():
 
 def approve_hours():
     today = datetime.datetime.today().strftime(DATE_FORMAT)
-    res = simplicate().hours_approval({'employee_id':settings.employee_id, 'approvalstatus_id':APRROVED_ID, 'date':today})
+    filter = {'employee_id':settings.employee_id, 'approvalstatus_id':APRROVED_ID, 'date':today}
+    res = simplicate().hours_approval(filter)
     return res
 
 if __name__== '__main__':
