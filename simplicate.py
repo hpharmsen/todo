@@ -79,7 +79,6 @@ def book(search, amount, note='', date=None):
             "start_date": date,
             "note": note,
         }
-        print('posting')
         res = simplicate().book_hours(postdata)
         return res
     else:

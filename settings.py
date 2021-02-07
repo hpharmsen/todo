@@ -11,7 +11,6 @@ except:
     inifile.read(scriptpath / 'todo.ini')
 
 datafolder = Path(inifile.get('general', 'datafolder'))
-timesheetuser = inifile.get('timesheet', 'timesheetuser')
 todoist_api_key = inifile.get('todoist', 'api_key')
 todoist_user_id = int(inifile.get('todoist', 'user_id'))
 
