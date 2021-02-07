@@ -10,7 +10,7 @@ class Item:
     id: int = 0
 
     def dup(self):
-        return Item( self.desc, self.prio, self.id)
+        return Item(self.desc, self.prio, self.id)
 
     def __repr__(self):
         return f'{priorities[self.prio]} {self.desc}'
