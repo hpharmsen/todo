@@ -1,4 +1,4 @@
-import sys, re
+import sys
 import subprocess
 
 # TODO:
@@ -6,10 +6,13 @@ import subprocess
 # - Do not sync items from shared todoist projects that are not assigned to me nor assigned by me
 
 from dayclass import Day, datafolder, priorityActions
-from ist import Ist  # todoist
-from settings import panic, getNextDay, getPrevDay
+from settings import getNextDay, getPrevDay, todoist_api_key
+from base import panic, extractDuration
+
+if todoist_api_key:
+    from ist import Ist  # todoist
 from item import Item
-from simplicate import book, hours_booked_status, hours_booked, approve_hours
+from simplicate import book, hours_booked_status, approve_hours, printHoursBooked
 
 
 def isInt(s):
@@ -25,17 +28,6 @@ def getIntParam():
         return int(sys.argv[2])
     except:
         panic('Provide integer as 2nd parameter')
-
-
-def extractDuration(s):
-    match = re.match('(\d*\.?\d+)([hm])', s)
-    if not match:
-        return
-    number = float(match.groups()[0])
-    if match.groups()[1] == 'h':
-        return number
-    else:
-        return 1.0 * number / 60
 
 
 def getTextParam(paramnum=2):
@@ -113,11 +105,6 @@ def push_all(day, ist):
     day.pushAllForward()
 
 
-def printHoursBooked():
-    lines = ['{booked:0.2f} {project}, {task} - {note}'.format(**line) for line in hours_booked()]
-    print('\n'.join(sorted(lines)))
-
-
 def printPriorities():
     pass
 
@@ -153,10 +140,14 @@ def printHelp():
 
 
 if __name__ == '__main__':
-    ist = Ist()
+    if todoist_api_key:
+        ist = Ist()
+    else:
+        ist = None
     day = Day()
     day.pullAll()
-    ist.sync(day)
+    if ist:
+        ist.sync(day)
 
     action = ''
     DayAction = True
@@ -165,29 +156,34 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         action = sys.argv[1].lower()
         params = sys.argv[2:]
+        itemnumber = None
 
         if action == 'undone':
             action = 'normal'
 
         if action == 'add':
             todo_item = day.add(Item(getTextParam()))
-            todo_item.id = ist.add_item(todo_item)
+            if ist:
+                todo_item.id = ist.add_item(todo_item)
 
         elif action == 'del':
             id = day.delete(getIntParam())
-            if id:
+            if id and ist:
                 ist.delete_item(id)
 
         elif action == 'dup':
             item = day.duplicate(getIntParam())
-            item.id = ist.add_item(item)
+            if ist:
+                item.id = ist.add_item(item)
 
         elif action in priorityActions:
             prio = priorityActions.index(action)
             if isInt(sys.argv[2]):
                 # syntax: todo high 3
-                item = day.setPriority(getIntParam(), prio)
-                if item.id:
+                itemnumber = getIntParam()
+                oldprio = day.items[itemnumber].prio
+                item = day.setPriority(itemnumber, prio)
+                if item.id and ist:
                     try:
                         ist.set_priority(item.id, item.ist_prio())
                     except Exception as e:
@@ -200,13 +196,14 @@ if __name__ == '__main__':
                 # syntax: todo low read a boook
                 if getTextParam(2):
                     item = day.add(Item(getTextParam(2), prio))
-                    item.id = ist.add_item(item)
+                    if ist:
+                        item.id = ist.add_item(item)
                 else:
                     # syntax: todo done 3h overleg
                     item = Item('')  # Special case, only book hours if specified. No todo item.
 
             if action == 'done':
-                if item.id:
+                if item.id and ist:
                     try:
                         ist.complete_item(item.id)
                     except:
@@ -219,11 +216,14 @@ if __name__ == '__main__':
                         panic('Specify project/task. Syntax: todo done 1 3h Sales')
 
                     if not book(project, duration, item.desc):
+                        # Set back the prio to what it was
+                        if itemnumber != None:
+                            day.setPriority(itemnumber, oldprio)
                         sys.exit()
         elif action == 'push':
             if len(sys.argv) == 3:
                 id = day.pushForward(getIntParam())
-                if id:
+                if id and ist:
                     ist.push_forward(id)
             else:
                 push_all(day, ist)
@@ -236,7 +236,7 @@ if __name__ == '__main__':
 
         elif action == 'pushback':
             id = day.pushBack(getIntParam())
-            if id:
+            if id and ist:
                 ist.push_back(id)
 
         elif action == 'schedule':
@@ -244,13 +244,14 @@ if __name__ == '__main__':
             if isInt(sys.argv[3]):
                 # syntax: todo schedule d/m[/y] 9
                 id, date = day.reschedule(int(sys.argv[3]), date_str)
-                if id:
+                if id and ist:
                     ist.reschedule(id, date)
             else:
                 # syntax: todo schedule d/m[/y] thingie
-                item, date = day.schedule(getTextParam(3), date_str)
-                item.id = ist.add_item(item)
-                ist.reschedule(item.id, date)
+                item, date = day.schedule(Item(getTextParam(3)), date_str)
+                if ist:
+                    item.id = ist.add_item(item)
+                    ist.reschedule(item.id, date)
 
         elif action == 'next':
             day = Day(getNextDay(day.date))
@@ -262,7 +263,8 @@ if __name__ == '__main__':
             num = getIntParam()
             new_text = getTextParam(3)
             item = day.edit(num, new_text)
-            ist.edit_item(item.id, new_text)
+            if ist:
+                ist.edit_item(item.id, new_text)
 
         elif action == 'today':
             print(day.asText())
@@ -285,7 +287,8 @@ if __name__ == '__main__':
 
         elif action == 'ready':
             approve_hours()
-            push_all(day, ist)
+            if ist:
+                push_all(day, ist)
 
         elif action == 'ids':
             # Show the todo list with todoist id's

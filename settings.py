@@ -1,5 +1,4 @@
 import datetime
-import sys
 from pathlib import Path
 from configparser import ConfigParser
 
@@ -11,22 +10,27 @@ except:
     inifile.read(scriptpath / 'todo.ini')
 
 datafolder = Path(inifile.get('general', 'datafolder'))
-todoist_api_key = inifile.get('todoist', 'api_key')
-todoist_user_id = int(inifile.get('todoist', 'user_id'))
+if inifile.has_section('todoist'):
+    todoist_api_key = inifile.get('todoist', 'api_key')
+    todoist_user_id = int(inifile.get('todoist', 'user_id'))
+else:
+    todoist_api_key = todoist_user_id = None
 
 subdomain = inifile.get('simplicate', 'subdomain')
 api_key = inifile.get('simplicate', 'api_key')
 api_secret = inifile.get('simplicate', 'api_secret')
-employee_id = inifile.get('simplicate', 'employee_id')
 employee_name = inifile.get('simplicate', 'employee_name')
 
-
-def panic(s):
-    print(s)
-    sys.exit(1)
-
-
 priorities = ['!', '-', '~', 'M', 'X']
+
+def get_employee_id():
+    try:
+        return inifile.get('simplicate', 'employee_id')
+    except:
+        return ''
+
+def set_employee_id(id):
+    inifile['simplicate']['employee_id'] = id
 
 
 def getNextDay(date):
@@ -45,3 +49,5 @@ def getPrevDay(date):
     elif date.weekday() == 6:
         date += datetime.timedelta(days=-2)
     return date
+
+

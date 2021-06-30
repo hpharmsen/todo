@@ -127,9 +127,9 @@ class Ist:
             else:
                 # No id, must be a new item. Add it to todoist
                 item = self.api.add_item(day_item.desc)
-                self.api.items.update(item.id, priority=day_item.ist_prio())
+                self.api.items.update(item['id'], priority=day_item.ist_prio())
                 self.api.commit()
-                day_item.id = item.id
+                day_item.id = item['id']
 
     def __str__(self):
         projects = defaultdict(list)
@@ -157,7 +157,8 @@ class Ist:
         i = item.ist_prio()
         new = self.api.add_item(item.desc, priority=item.ist_prio())
         self.api.commit()
-        return new['id']
+        if new:
+            return new['id']
 
     def complete_item(self, id):
         date_completed = datetime.datetime.today().strftime('%Y-%m-%d')

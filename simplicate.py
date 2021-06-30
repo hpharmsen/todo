@@ -1,7 +1,8 @@
 import datetime
 import pickle
+from pathlib import Path
 
-import settings
+from base import bcolors
 from pysimplicate import Simplicate
 
 APRROVED_ID = "approvalstatus:9a4660a21af7234e"
@@ -9,10 +10,10 @@ DATE_FORMAT = '%Y-%m-%d'
 
 _sim = None
 
-
 def simplicate():
     global _sim
     if not _sim:
+        import settings
         _sim = Simplicate(settings.subdomain, settings.api_key, settings.api_secret)
     return _sim
 
@@ -25,18 +26,19 @@ def find_bookable(zoek):
     if len(matching_services) == 1:
         return matching_services[0]
     if len(matching_services) == 0:
-        print('No service found')
+        print(f'{bcolors.WARNING}No service found with "{zoek}"{bcolors.ENDC}')
     else:
-        print('Multiple services found')
+        print(f'{bcolors.WARNING}Multiple services found matching "{zoek}"{bcolors.ENDC}')
         for f in matching_services:
-            print(f)
-    return None, None, None
+            print(f[3])
+    return None, None, None, None
 
 
 def find_matching_services(zoek, use_cache=True):
     zoek = zoek.lower()
+    scriptpath = Path(__file__).resolve().parent
+    cache_file = scriptpath / '.servicescache'
 
-    cache_file = settings.scriptpath / '.servicescache'
     if use_cache:
         if not cache_file.is_file():
             return []  # Just return [] to run function again with use_cache=True
@@ -57,21 +59,21 @@ def find_matching_services(zoek, use_cache=True):
     for s in services:
         for h in s.get('hour_types', []):
             full_name = projects[s['project_id']] + ' ' + s['name'] + ' ' + h['hourstype']['label']
-            full_name = full_name.replace(' Internal ', ' ')
+            full_name = full_name.replace('Internal', '').strip()
             if not full_name.lower().count(zoek):
                 continue
             matching_services += [full_name]
-            res += [(s['project_id'], s['id'], h['hourstype']['id'])]
+            res += [(s['project_id'], s['id'], h['hourstype']['id'], full_name)]
     return res
 
 
 def book(search, amount, note='', date=None):
     if not date:
         date = datetime.datetime.now().strftime(DATE_FORMAT)
-    project_id, service_id, hourstype_id = find_bookable(search)
+    project_id, service_id, hourstype_id, full_name = find_bookable(search)
     if project_id:
         postdata = {
-            "employee_id": settings.employee_id,
+            "employee_id": get_employee_id(),
             "project_id": project_id,
             "projectservice_id": service_id,
             "type_id": hourstype_id,
@@ -80,14 +82,15 @@ def book(search, amount, note='', date=None):
             "note": note,
         }
         res = simplicate().book_hours(postdata)
+        howmuch = f'{amount:.1f} hours' if amount >=1 else f'{amount*60:.0f} minutes'
+
+        print(  f'{bcolors.GREEN}Booked {howmuch} on {full_name}.{bcolors.ENDC}')
         return res
-    else:
-        print('nope')
 
 
 def hours_booked_status():
     now = datetime.datetime.now()
-    booked = simplicate().hours_count({'employee_name': settings.employee_name, 'day': now.strftime(DATE_FORMAT)})
+    booked = simplicate().hours_count({'employee_name': get_employee_name(), 'day': now.strftime(DATE_FORMAT)})
 
     weekday = now.weekday()
     if weekday >= 5:  # zo za
@@ -105,19 +108,60 @@ def hours_booked_status():
 
 def hours_booked():
     now = datetime.datetime.now()
-    booked = simplicate().hours_simple({'employee_name': settings.employee_name, 'day': now.strftime(DATE_FORMAT)})
+    booked = simplicate().hours_simple({'employee_name': get_employee_name(), 'day': now.strftime(DATE_FORMAT)})
     return [
-        {'project': b['project_name'], 'task': b['service'] + ' ' + b['type'], 'booked': b['hours'], 'note': b['note']}
+        {'project': b['project_name'],
+         'task': b['service'] + ' ' + b['type'],
+         'booked': b['hours'],
+         'note': b['note']}
         for b in booked
     ]
 
 
 def approve_hours():
     today = datetime.datetime.today().strftime(DATE_FORMAT)
-    filter = {'employee_id': settings.employee_id, 'approvalstatus_id': APRROVED_ID, 'date': today}
+    filter = {'employee_id': get_employee_id(), 'approvalstatus_id': APRROVED_ID, 'date': today}
     res = simplicate().hours_approval(filter)
     return res
 
 
+def printHoursBooked():
+    booked = {}
+    for item in hours_booked():
+        key = f"{item['project']}, {item['task']}"
+        if booked.get(key):
+            booked[key][0] += item['booked']
+            if booked[key][1]:
+                booked[key][1] += ' / ' + item['note']
+        else:
+            booked[key] = [item['booked'], item['note']]
+    for key, val in booked.items():
+        text = key.replace( 'Internal, ','').replace( ' normal', '')
+        if val[1]:
+            text += ' - ' + val[1]
+        print( f"{val[0]:.2f} {text}")
+
+_employee_name = ''
+def get_employee_name():
+    global _employee_name
+    if not _employee_name:
+        import settings
+        _employee_name = settings.employee_name
+    return _employee_name
+
+_employee_id = ''
+def get_employee_id():
+    global _employee_id
+    if not _employee_id:
+        import settings
+        _employee_id = settings.get_employee_id()
+        if not _employee_id:
+            emp = simplicate().employee({'name':get_employee_name()})
+            _employee_id = emp['id']
+    return _employee_id
+
+
 if __name__ == '__main__':
     print(hours_booked_status())
+
+

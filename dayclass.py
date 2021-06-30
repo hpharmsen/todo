@@ -1,7 +1,8 @@
 import datetime
 
 from item import Item
-from settings import datafolder, priorities, getNextDay, getPrevDay, panic
+from settings import datafolder, priorities, getNextDay, getPrevDay
+from base import panic, bcolors
 
 
 class Day:
@@ -88,8 +89,13 @@ class Day:
                 # Empty line between before the done items
                 if i > 1 and self.items[i - 2].prio != 4 and item.prio == 4:
                     res += '\n'
+                if item.prio in (2,4):
+                    res += bcolors.GRAY
             id = f" :: {item.id}" if (display == 'file' or show_ids) and item.id else ""
-            res += f"{i:2}. {item}{id}\n"
+            res += f"{i:2}. {item}{id}"
+            if display == 'screen' and item.prio in (2,4):
+                res += bcolors.ENDC
+            res += "\n"
         return res
 
     def asText(self):
