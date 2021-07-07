@@ -1,5 +1,6 @@
 import sys
 import subprocess
+from collections import namedtuple
 
 # TODO:
 # - assign to specific person
@@ -7,12 +8,14 @@ import subprocess
 
 from dayclass import Day, datafolder, priorityActions
 from settings import getNextDay, getPrevDay, todoist_api_key
-from base import panic, extractDuration
+from base import panic, extractDuration, isDate
 
 if todoist_api_key:
     from ist import Ist  # todoist
 from item import Item
 from simplicate import book, hours_booked_status, approve_hours, printHoursBooked
+
+Command = namedtuple("Command", "action itemnumber text timespent task date")
 
 
 def isInt(s):
@@ -108,6 +111,56 @@ def push_all(day, ist):
 def printPriorities():
     pass
 
+def parse_commandline():
+
+    def append( oldtext, newtext):
+        if oldtext:
+            return oldtext + ' ' + newtext
+        return newtext
+
+    action=''
+    itemnumber=None
+    text=''
+    timespent=0
+    task = ''
+    date=None
+
+    if len(sys.argv) > 1:
+        action = sys.argv[1].lower() # first param is always the action
+        params = sys.argv[2:]
+        try:
+            itemnumber = int(params[0])
+            params = params[1:]
+        except:
+            pass
+
+        # Fill command.text with the rest of the command line params
+        # unless something special (duration, date) happens
+        collecting_task = False
+        for param in params:
+            duration = extractDuration(param)
+            if duration: # Duration found
+                timespent = duration
+                collecting_task = True
+                param = ''
+            if isDate(param): # Date found
+                date = param
+                break
+            # Param is just text, add it to command.text or command.task depending on where we are
+            if collecting_task:
+                task = append(task, param)
+            else:
+                text = append(text, param)
+    return Command(action, itemnumber, text, timespent, task, date)
+
+
+def get_todoist(day):
+    ist = None
+    if todoist_api_key:
+        ist = Ist()
+        ist.sync(day)
+    return ist
+
 
 def printHelp():
     print('todo                        - lists todays items')
@@ -127,8 +180,8 @@ def printHelp():
     print('todo push [9]               - moves item or all undone to the next day')
     print('todo pull [9]               - moves item or all undone from previous day to current')
     print('todo pushback [9]           - moves item or all undone from previous day to current')
-    print('todo schedule d/m/[y] 9     - moves item 9 to the specfied day')
-    print('todo schedule d/m[/y] thing - adds thing to the specfied day')
+    print('todo schedule 9 d/m/[y]      - moves item 9 to the specfied day')
+    print('todo schedule thing d/m[/y] - adds thing to the specfied day')
     print('todo today                  - prints the day' 's file in full')
     print('todo find text              - finds any line with text')
     print('todo meeting text           - finds meetings with text in the name')
@@ -140,49 +193,48 @@ def printHelp():
 
 
 if __name__ == '__main__':
-    if todoist_api_key:
-        ist = Ist()
-    else:
-        ist = None
+    command = parse_commandline()
     day = Day()
     day.pullAll()
-    if ist:
-        ist.sync(day)
+    ist = get_todoist(day)
 
     action = ''
     DayAction = True
     show_ids = False
 
-    if len(sys.argv) > 1:
-        action = sys.argv[1].lower()
-        params = sys.argv[2:]
-        itemnumber = None
+    if command.action:
+        action = command.action
 
         if action == 'undone':
             action = 'normal'
 
         if action == 'add':
-            todo_item = day.add(Item(getTextParam()))
+            if not command.text:
+                panic('Pass text to add command')
+            todo_item = day.add(Item(command.text))
             if ist:
                 todo_item.id = ist.add_item(todo_item)
 
         elif action == 'del':
-            id = day.delete(getIntParam())
+            if not command.itemnumber:
+                panic( 'Pass an item number to del command')
+            id = day.delete(command.itemnumber)
             if id and ist:
                 ist.delete_item(id)
 
         elif action == 'dup':
-            item = day.duplicate(getIntParam())
+            if not command.itemnumber:
+                panic( 'Pass an item number to dup command')
+            item = day.duplicate(command.itemnumber)
             if ist:
                 item.id = ist.add_item(item)
 
         elif action in priorityActions:
             prio = priorityActions.index(action)
-            if isInt(sys.argv[2]):
+            if command.itemnumber:
                 # syntax: todo high 3
-                itemnumber = getIntParam()
-                oldprio = day.items[itemnumber].prio
-                item = day.setPriority(itemnumber, prio)
+                oldprio = day.items[command.itemnumber-1].prio
+                item = day.setPriority(command.itemnumber, prio)
                 if item.id and ist:
                     try:
                         ist.set_priority(item.id, item.ist_prio())
@@ -194,8 +246,8 @@ if __name__ == '__main__':
 
             else:
                 # syntax: todo low read a boook
-                if getTextParam(2):
-                    item = day.add(Item(getTextParam(2), prio))
+                if command.text:
+                    item = day.add(Item(command.text, prio))
                     if ist:
                         item.id = ist.add_item(item)
                 else:
@@ -208,47 +260,56 @@ if __name__ == '__main__':
                         ist.complete_item(item.id)
                     except:
                         pass  # Is toch done dus who cares
-                durationtuple = getDurationParam()
-                if durationtuple:
+                if command.timespent:
                     # syntax: todo done [4|task description] 3h overleg
-                    duration, project = durationtuple
-                    if not project:
+                    if not command.task:
                         panic('Specify project/task. Syntax: todo done 1 3h Sales')
 
-                    if not book(project, duration, item.desc):
+                    if not book(command.task, command.timespent, item.desc):
                         # Set back the prio to what it was
-                        if itemnumber != None:
-                            day.setPriority(itemnumber, oldprio)
+                        if command.itemnumber == None:
+                            # Remove (do not add) the item
+                            # Should be refactored so item will not be added in the first place
+                            id = day.delete(len(day.items))
+                            if id and ist:
+                                ist.delete_item(id)
+                        else:
+                            # Set prio back to the old prio
+                            day.setPriority(command.itemnumber, oldprio)
+                        day.write()
                         sys.exit()
         elif action == 'push':
-            if len(sys.argv) == 3:
-                id = day.pushForward(getIntParam())
+            if command.itemnumber:
+                id = day.pushForward(command.itemnumber)
                 if id and ist:
                     ist.push_forward(id)
+            elif command.text:
+                panic( 'Pushing new items is not yet supported')
             else:
                 push_all(day, ist)
 
         elif action == 'pull':
-            if len(sys.argv) == 3:
-                day.pullFromLast(getIntParam())
+            if command.itemnumber:
+                day.pullFromLast(command.itemnumber)
             else:
                 day.pullAll()
 
         elif action == 'pushback':
-            id = day.pushBack(getIntParam())
+            if not command.itemnumber:
+                panic( 'Pass item number to pushback command')
+            id = day.pushBack(command.itemnumber)
             if id and ist:
                 ist.push_back(id)
 
         elif action == 'schedule':
-            date_str = sys.argv[2]
-            if isInt(sys.argv[3]):
+            if command.itemnumber:
                 # syntax: todo schedule d/m[/y] 9
-                id, date = day.reschedule(int(sys.argv[3]), date_str)
+                id, date = day.reschedule(command.itemnumber, command.date)
                 if id and ist:
                     ist.reschedule(id, date)
             else:
                 # syntax: todo schedule d/m[/y] thingie
-                item, date = day.schedule(Item(getTextParam(3)), date_str)
+                item, date = day.schedule(Item(command.text), command.date)
                 if ist:
                     item.id = ist.add_item(item)
                     ist.reschedule(item.id, date)
@@ -260,11 +321,13 @@ if __name__ == '__main__':
             day = Day(getPrevDay(day.date))
 
         elif action == 'edit':
-            num = getIntParam()
-            new_text = getTextParam(3)
-            item = day.edit(num, new_text)
+            if not command.itemnumber:
+                panic( 'Pass item number to edit command')
+            if not command.text:
+                panic('Pass new text to edit command')
+            item = day.edit(command.itemnumber, command.text)
             if ist:
-                ist.edit_item(item.id, new_text)
+                ist.edit_item(item.id, command.text)
 
         elif action == 'today':
             print(day.asText())
@@ -275,7 +338,7 @@ if __name__ == '__main__':
             DayAction = False
 
         elif action == 'meeting':
-            findMeeting(getTextParam())
+            findMeeting(command.text)
 
         elif action == 'booked':
             printHoursBooked()
@@ -300,15 +363,13 @@ if __name__ == '__main__':
 
         elif action == 'log':
             # syntax: todo log Offerte maken 3h Sales
-            durationtuple = getDurationParam()
-            if not durationtuple:
+            if not command.timespent:
                 panic('specify duration like 30m or 1h')
-            duration, project = durationtuple
-            if not project:
+            if not command.task:
                 panic('Specify project/task. Syntax: todo log Offerte maken 3h Sales')
 
             comment = getTextParam()
-            if not book(project, duration, comment):
+            if not book(command.task, command.timespent, comment):
                 sys.exit()
             DayAction = 0
 

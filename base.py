@@ -3,7 +3,7 @@ import sys
 
 
 def panic(s):
-    print(s)
+    print(bcolors.FAIL + s + bcolors.ENDC)
     sys.exit(1)
 
 
@@ -29,5 +29,10 @@ def extractDuration(s):
         return number
     else:
         return 1.0 * number / 60
+
+def isDate(s):
+    match = re.match('(\d\d?)/(\d\d?)(\d\d\d?\d?)?', s)
+    if match:
+        return s
 
 
