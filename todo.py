@@ -24,45 +24,6 @@ from simplicate import (
 Command = namedtuple("Command", "action itemnumber text timespent task date")
 
 
-def isInt(s):
-    try:
-        int(s)
-        return 1
-    except:
-        return 0
-
-
-def getIntParam():
-    try:
-        return int(sys.argv[2])
-    except:
-        panic("Provide integer as 2nd parameter")
-
-
-def getTextParam(paramnum=2):
-    if not sys.argv[paramnum:]:
-        panic("Provide text as parameter " + str(paramnum))
-    args = sys.argv[paramnum:]
-    res = ""
-    for i in range(len(args)):
-        if extractDuration(args[i]):
-            return res
-        if res:
-            res += " "
-        res += args[i]
-    return res
-
-
-def getDurationParam(paramnum=2):
-    if not sys.argv[paramnum:]:
-        panic("Provide text as parameter " + str(paramnum))
-    args = sys.argv[paramnum:]
-    for i in range(len(args)):
-        duration = extractDuration(args[i])
-        if duration:
-            return duration, " ".join(args[i + 1 :])
-
-
 def data_files():
     return [
         filepath
@@ -116,10 +77,6 @@ def push_all(day, ist):
             except:
                 pass  # Er is dan wel iets raars aan de hand
     day.pushAllForward()
-
-
-def printPriorities():
-    pass
 
 
 def parse_commandline():
@@ -191,22 +148,16 @@ def printHelp():
     print("todo done thingie           - adds thingie and marks it as done")
     print("todo undone 9               - marks item as undone")
     print("todo push [9]               - moves item or all undone to the next day")
-    print(
-        "todo pull [9]               - moves item or all undone from previous day to current"
-    )
-    print(
-        "todo pushback [9]           - moves item or all undone from previous day to current"
-    )
-    print("todo schedule 9 d/m/[y]      - moves item 9 to the specfied day")
+    print("todo pull [9]               - moves item or all undone from previous day to current")
+    print("todo pushback [9]           - moves item or all undone from previous day to current")
+    print("todo schedule 9 d/m/[y]     - moves item 9 to the specfied day")
     print("todo schedule thing d/m[/y] - adds thing to the specfied day")
     print("todo today                  - prints the day" "s file in full")
     print("todo find text              - finds any line with text")
     print("todo meeting text           - finds meetings with text in the name")
     print("todo booked                 - list hours booked today")
     print("todo note                   - opens editor with the current day")
-    print(
-        "todo ready                  - closes day in timesheet and pushes all open items to next day"
-    )
+    print("todo ready                  - closes day in timesheet and pushes all open items to next day")
     print("todo ids                    - shows the list with todoist id's")
     print("todo help                   - this message\n")
 
@@ -215,24 +166,10 @@ if __name__ == "__main__":
     command = parse_commandline()
     if command.action == "undone":
         command.action = "normal"
-    print(command)
 
     # Load the right day
-    if command.date and command.action in (
-        "",
-        "add",
-        "del",
-        "dup",
-        "low",
-        "high",
-        "normal",
-        "miek",
-        "edit",
-        "today",
-        "booked",
-        "note",
-        "log",
-    ):
+    if command.date and \
+       command.action in ["", "add", "del", "dup", "edit", "today", "booked", "note", "log"] + priorityActions:
         day = Day(command.date)
         ist = None
     else:
@@ -431,7 +368,6 @@ if __name__ == "__main__":
         panic("Unknown action: " + action)
 
     if DayAction:
-        printPriorities()
         day.reorder()
         day.show(show_ids)
         if day.originaltext != day.asText():
