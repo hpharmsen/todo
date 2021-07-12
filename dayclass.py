@@ -7,20 +7,20 @@ from base import panic, bcolors
 
 class Day:
     items = []  # List of Item
-    notedata = ''
+    notedata = ""
     date = datetime.date.today()
-    originaltext = ''
+    originaltext = ""
 
     ######### Construction, read and write ############
 
     def __init__(self, date=datetime.date.today()):
         self.date = date
         self.items = []
-        self.notedata = ''
-        self.originaltext = ''
+        self.notedata = ""
+        self.originaltext = ""
         self._dailyNotesBook = None
 
-        self.path = datafolder / f'{self.date}.txt'
+        self.path = datafolder / f'{self.date.strftime("%Y-%m-%d")}.txt'
 
         self.read()
 
@@ -31,23 +31,23 @@ class Day:
         with open(self.path) as f:
             self.originaltext = f.read()
 
-        data = self.originaltext.split('\n\n', 1)
+        data = self.originaltext.split("\n\n", 1)
         tododata = data[0]
         if len(data) > 1:
             self.notedata = data[1]
         else:
-            self.notedata = ''
+            self.notedata = ""
 
-        for line in tododata.split('\n'):
+        for line in tododata.split("\n"):
             if not line:
                 continue
             try:
-                num = int(line.split('. ')[0].strip())
+                num = int(line.split(". ")[0].strip())
             except:
                 num = 0
             if num:
-                line = line.split('. ', 1)[1]
-            if line[:3] == 'X. ':
+                line = line.split(". ", 1)[1]
+            if line[:3] == "X. ":
                 num = 1
                 line = line[3:]
                 prio = 3
@@ -57,8 +57,8 @@ class Day:
             else:
                 prio = 1
 
-            if line.count(' :: '):
-                line, id = line.split(' :: ')
+            if line.count(" :: "):
+                line, id = line.split(" :: ")
                 id = int(id)
             else:
                 id = 0
@@ -69,7 +69,7 @@ class Day:
         self.items.sort(key=lambda a: a.prio)
 
     def write(self):
-        with open(self.path, 'w') as f:
+        with open(self.path, "w") as f:
             f.write(self.asText())
 
     def by_id(self):
@@ -79,21 +79,23 @@ class Day:
     ######### Display ############
 
     def show(self, show_ids=False):
-        print(f"\nTo do's for {weekdays[self.date.weekday()]} {self.date.day} {monthnames[self.date.month-1]}\n")
-        print(self.asStrings(display='screen', show_ids=show_ids))
+        print(
+            f"\nTo do's for {weekdays[self.date.weekday()]} {self.date.day} {monthnames[self.date.month-1]}\n"
+        )
+        print(self.asStrings(display="screen", show_ids=show_ids))
 
-    def asStrings(self, display='file', show_ids=False):
-        res = ''
+    def asStrings(self, display="file", show_ids=False):
+        res = ""
         for i, item in enumerate(self.items, 1):
-            if display == 'screen':
+            if display == "screen":
                 # Empty line between before the done items
                 if i > 1 and self.items[i - 2].prio != 4 and item.prio == 4:
-                    res += '\n'
-                if item.prio in (2,4):
+                    res += "\n"
+                if item.prio in (2, 4):
                     res += bcolors.GRAY
-            id = f" :: {item.id}" if (display == 'file' or show_ids) and item.id else ""
+            id = f" :: {item.id}" if (display == "file" or show_ids) and item.id else ""
             res += f"{i:2}. {item}{id}"
-            if display == 'screen' and item.prio in (2,4):
+            if display == "screen" and item.prio in (2, 4):
                 res += bcolors.ENDC
             res += "\n"
         return res
@@ -101,14 +103,14 @@ class Day:
     def asText(self):
         res = self.asStrings()
         if self.notedata:
-            res += '\n' + self.notedata
+            res += "\n" + self.notedata
         return res
 
     ######### Operations ############
 
     def add(self, item):
         if item.prio == -1:
-            if item.desc[0] in priorities and item.desc[1] == ' ':
+            if item.desc[0] in priorities and item.desc[1] == " ":
                 # priority added with the description
                 item.prio = priorities.index(item.desc[0])
                 item.desc = item.desc[2:]
@@ -209,17 +211,30 @@ class Day:
 
 
 def dmy2ymd(date_str):
-    y = datetime.datetime.today().strftime('%Y')
+    y = datetime.datetime.today().strftime("%Y")
     try:
-        d, m, y = date_str.split('/')
+        d, m, y = date_str.split("/")
     except:
         try:
-            d, m = date_str.split('/')
+            d, m = date_str.split("/")
         except:
-            panic(f'Invalid date {date_str}. Specify in d/m or d/m/y format')
-    return f'{y}-{m}-{d}'
+            panic(f"Invalid date {date_str}. Specify in d/m or d/m/y format")
+    return f"{y}-{m}-{d}"
 
 
-weekdays = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo']
-monthnames = ['jan', 'feb', 'maart', 'apr', 'mei', 'jun', 'jul', 'aug', 'sept', 'okt', 'nov', 'dec']
-priorityActions = ['high', 'normal', 'low', 'miek', 'done']
+weekdays = ["Ma", "Di", "Wo", "Do", "Vr", "Za", "Zo"]
+monthnames = [
+    "jan",
+    "feb",
+    "maart",
+    "apr",
+    "mei",
+    "jun",
+    "jul",
+    "aug",
+    "sept",
+    "okt",
+    "nov",
+    "dec",
+]
+priorityActions = ["high", "normal", "low", "miek", "done"]

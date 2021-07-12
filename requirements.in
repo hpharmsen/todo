@@ -1,6 +1,7 @@
 PyMySQL
 PyYAML
 requests
+typing
 todoist-python
 -e git+https://github.com/hpharmsen/hplib#egg=hplib
 pyinstaller

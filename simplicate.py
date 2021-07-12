@@ -6,14 +6,16 @@ from base import bcolors
 from pysimplicate import Simplicate
 
 APRROVED_ID = "approvalstatus:9a4660a21af7234e"
-DATE_FORMAT = '%Y-%m-%d'
+DATE_FORMAT = "%Y-%m-%d"
 
 _sim = None
+
 
 def simplicate():
     global _sim
     if not _sim:
         import settings
+
         _sim = Simplicate(settings.subdomain, settings.api_key, settings.api_secret)
     return _sim
 
@@ -28,7 +30,9 @@ def find_bookable(zoek):
     if len(matching_services) == 0:
         print(f'{bcolors.WARNING}No service found with "{zoek}"{bcolors.ENDC}')
     else:
-        print(f'{bcolors.WARNING}Multiple services found matching "{zoek}"{bcolors.ENDC}')
+        print(
+            f'{bcolors.WARNING}Multiple services found matching "{zoek}"{bcolors.ENDC}'
+        )
         for f in matching_services:
             print(f[3])
     return None, None, None, None
@@ -37,37 +41,43 @@ def find_bookable(zoek):
 def find_matching_services(zoek, use_cache=True):
     zoek = zoek.lower()
     scriptpath = Path(__file__).resolve().parent
-    cache_file = scriptpath / '.servicescache'
+    cache_file = scriptpath / ".servicescache"
 
     if use_cache:
         if not cache_file.is_file():
             return []  # Just return [] to run function again with use_cache=True
-        with open(cache_file, 'rb') as f:
+        with open(cache_file, "rb") as f:
             projects, services = pickle.load(f)
     else:
-        projects = {p['id']: p['name'] for p in simplicate().project({'active': True})}
+        projects = {p["id"]: p["name"] for p in simplicate().project({"active": True})}
         services = [
             s
-            for s in simplicate().service({'status': 'open', 'track_hours': True})
-            if s.get('name') and s['project_id'] in projects.keys()
+            for s in simplicate().service({"status": "open", "track_hours": True})
+            if s.get("name") and s["project_id"] in projects.keys()
         ]
-        with open(cache_file, 'wb') as f:
+        with open(cache_file, "wb") as f:
             pickle.dump((projects, services), f)
 
     res = []
     matching_services = []
     for s in services:
-        for h in s.get('hour_types', []):
-            full_name = projects[s['project_id']] + ' ' + s['name'] + ' ' + h['hourstype']['label']
-            full_name = full_name.replace('Internal', '').strip()
+        for h in s.get("hour_types", []):
+            full_name = (
+                projects[s["project_id"]]
+                + " "
+                + s["name"]
+                + " "
+                + h["hourstype"]["label"]
+            )
+            full_name = full_name.replace("Internal", "").strip()
             if not full_name.lower().count(zoek):
                 continue
             matching_services += [full_name]
-            res += [(s['project_id'], s['id'], h['hourstype']['id'], full_name)]
+            res += [(s["project_id"], s["id"], h["hourstype"]["id"], full_name)]
     return res
 
 
-def book(search, amount, note='', date=None):
+def book(search, amount, note, date: str):
     if not date:
         date = datetime.datetime.now().strftime(DATE_FORMAT)
     project_id, service_id, hourstype_id, full_name = find_bookable(search)
@@ -82,86 +92,100 @@ def book(search, amount, note='', date=None):
             "note": note,
         }
         res = simplicate().book_hours(postdata)
-        howmuch = f'{amount:.1f} hours' if amount >=1 else f'{amount*60:.0f} minutes'
+        howmuch = f"{amount:.1f} hours" if amount >= 1 else f"{amount*60:.0f} minutes"
 
-        print(  f'{bcolors.GREEN}Booked {howmuch} on {full_name}.{bcolors.ENDC}')
+        print(f"{bcolors.GREEN}Booked {howmuch} on {full_name}.{bcolors.ENDC}")
         return res
 
 
-def hours_booked_status():
-    now = datetime.datetime.now()
-    booked = simplicate().hours_count({'employee_name': get_employee_name(), 'day': now.strftime(DATE_FORMAT)})
+def hours_booked_status(day=datetime.datetime.now()):
+    booked = simplicate().hours_count(
+        {"employee_name": get_employee_name(), "day": day.strftime(DATE_FORMAT)}
+    )
 
-    weekday = now.weekday()
+    weekday = day.weekday()
     if weekday >= 5:  # zo za
-        return ''
-    lunch = now.hour >= 12 and 30 * 60 or 0
-    start_time = datetime.datetime(now.year, now.month, now.day, 9, 30)
-    s = '{:0.2f} booked'.format(booked)
-    if now > start_time:
-        time_passed = now - start_time
+        return ""
+    start_time = datetime.datetime(day.year, day.month, day.day, 9, 30)
+    s = "{:0.2f} booked".format(booked)
+    if type(day) == datetime.datetime and day > start_time:
+        lunch = day.hour >= 12 and 30 * 60 or 0
+        time_passed = day - start_time
         missing = (((time_passed.seconds - lunch) * 4) / 3600 - 4 * booked) / 4.0
         if missing >= 0.5:
-            s += ', {:0.2f} hours missing'.format(missing)
+            s += ", {:0.2f} hours missing".format(missing)
     return s
 
 
-def hours_booked():
-    now = datetime.datetime.now()
-    booked = simplicate().hours_simple({'employee_name': get_employee_name(), 'day': now.strftime(DATE_FORMAT)})
+def hours_booked(day=datetime.datetime.now()):
+    booked = simplicate().hours_simple(
+        {"employee_name": get_employee_name(), "day": day.strftime(DATE_FORMAT)}
+    )
     return [
-        {'project': b['project_name'],
-         'task': b['service'] + ' ' + b['type'],
-         'booked': b['hours'],
-         'note': b['note']}
+        {
+            "project": b["project_name"],
+            "task": b["service"] + " " + b["type"],
+            "booked": b["hours"],
+            "note": b["note"],
+        }
         for b in booked
     ]
 
 
 def approve_hours():
     today = datetime.datetime.today().strftime(DATE_FORMAT)
-    filter = {'employee_id': get_employee_id(), 'approvalstatus_id': APRROVED_ID, 'date': today}
+    filter = {
+        "employee_id": get_employee_id(),
+        "approvalstatus_id": APRROVED_ID,
+        "date": today,
+    }
     res = simplicate().hours_approval(filter)
     return res
 
 
-def printHoursBooked():
+def printHoursBooked(day):
     booked = {}
-    for item in hours_booked():
+    for item in hours_booked(day):
         key = f"{item['project']}, {item['task']}"
         if booked.get(key):
-            booked[key][0] += item['booked']
+            booked[key][0] += item["booked"]
             if booked[key][1]:
-                booked[key][1] += ' / ' + item['note']
+                booked[key][1] += " / " + item["note"]
         else:
-            booked[key] = [item['booked'], item['note']]
+            booked[key] = [item["booked"], item["note"]]
     for key, val in booked.items():
-        text = key.replace( 'Internal, ','').replace( ' normal', '')
+        text = key.replace("Internal, ", "").replace(" normal", "")
         if val[1]:
-            text += ' - ' + val[1]
-        print( f"{val[0]:.2f} {text}")
+            text += " - " + val[1]
+        print(f"{val[0]:.2f} {text}")
 
-_employee_name = ''
+
+_employee_name = ""
+
+
 def get_employee_name():
     global _employee_name
     if not _employee_name:
         import settings
+
         _employee_name = settings.employee_name
     return _employee_name
 
-_employee_id = ''
+
+_employee_id = ""
+
+
 def get_employee_id():
     global _employee_id
     if not _employee_id:
         import settings
+
         _employee_id = settings.get_employee_id()
         if not _employee_id:
-            emp = simplicate().employee({'name':get_employee_name()})
-            _employee_id = emp['id']
+            emp = simplicate().employee({"name": get_employee_name()})
+            _employee_id = emp["id"]
     return _employee_id
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(hours_booked_status())
-
-
