@@ -164,12 +164,13 @@ def printHelp():
 
 if __name__ == "__main__":
     command = parse_commandline()
-    if command.action == "undone":
-        command.action = "normal"
+    action = command.action
+    if action == "undone":
+        action = "normal"
 
     # Load the right day
     if command.date and \
-       command.action in ["", "add", "del", "dup", "edit", "today", "booked", "note", "log"] + priorityActions:
+        action in ["", "add", "del", "dup", "edit", "today", "booked", "note", "log"] + priorityActions:
         day = Day(command.date)
         ist = None
     else:
@@ -180,7 +181,6 @@ if __name__ == "__main__":
     # Go process the command
     DayAction = True
     show_ids = False
-    action = command.action
 
     if not action:  # Just a listing
         if command.date:
@@ -323,7 +323,7 @@ if __name__ == "__main__":
         DayAction = False
 
     elif action == "find":
-        findText(getTextParam())
+        findText(command.text)
         DayAction = False
 
     elif action == "meeting":
@@ -338,7 +338,7 @@ if __name__ == "__main__":
         subprocess.run(["open", day.path], check=True)
 
     elif action == "ready":
-        approve_hours()
+        approve_hours(day.date)
         if ist:
             push_all(day, ist)
 
@@ -357,9 +357,8 @@ if __name__ == "__main__":
         if not command.task:
             panic("Specify project/task. Syntax: todo log Offerte maken 3h Sales")
 
-        comment = getTextParam()
         if not book(
-            command.task, command.timespent, comment, day.date.strftime(DATE_FORMAT)
+            command.task, command.timespent, command.text, day.date.strftime(DATE_FORMAT)
         ):
             sys.exit()
         DayAction = 0

@@ -186,17 +186,15 @@ class Day:
             lastday.write()
         return changed
 
-    def schedule(self, desc, date_str):
-        date = dmy2ymd(date_str)
+    def schedule(self, desc, date):
         day = Day(date)
         item = day.add(desc)
         day.write()
         return item, date
 
-    def reschedule(self, num, date_str):
+    def reschedule(self, num, date):
         item = self.items[num - 1]
         id = item.id
-        date = dmy2ymd(date_str)
         day = Day(date)
         day.add(item.dup())
         day.write()
@@ -208,18 +206,6 @@ class Day:
         item.id = 0
         self.items += [item]
         return item
-
-
-def dmy2ymd(date_str):
-    y = datetime.datetime.today().strftime("%Y")
-    try:
-        d, m, y = date_str.split("/")
-    except:
-        try:
-            d, m = date_str.split("/")
-        except:
-            panic(f"Invalid date {date_str}. Specify in d/m or d/m/y format")
-    return f"{y}-{m}-{d}"
 
 
 weekdays = ["Ma", "Di", "Wo", "Do", "Vr", "Za", "Zo"]

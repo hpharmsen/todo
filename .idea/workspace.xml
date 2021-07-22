@@ -141,7 +141,7 @@
         </ENTRIES>
       </EXTENSION>
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/todo.py" />
-      <option name="PARAMETERS" value="done Call met Wouter 1h hr 9/7" />
+      <option name="PARAMETERS" value="schedule 1 26/7" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -200,6 +200,11 @@
           <url>file://$PROJECT_DIR$/dayclass.py</url>
           <line>111</line>
           <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/todo.py</url>
+          <line>295</line>
+          <option name="timeStamp" value="18" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

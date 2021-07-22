@@ -132,12 +132,13 @@ def hours_booked(day=datetime.datetime.now()):
     ]
 
 
-def approve_hours():
-    today = datetime.datetime.today().strftime(DATE_FORMAT)
+def approve_hours(day=None):
+    if not day:
+        day = datetime.datetime.today()
     filter = {
         "employee_id": get_employee_id(),
         "approvalstatus_id": APRROVED_ID,
-        "date": today,
+        "date": day.strftime(DATE_FORMAT),
     }
     res = simplicate().hours_approval(filter)
     return res
