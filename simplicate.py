@@ -30,9 +30,7 @@ def find_bookable(zoek):
     if len(matching_services) == 0:
         print(f'{bcolors.WARNING}No service found with "{zoek}"{bcolors.ENDC}')
     else:
-        print(
-            f'{bcolors.WARNING}Multiple services found matching "{zoek}"{bcolors.ENDC}'
-        )
+        print(f'{bcolors.WARNING}Multiple services found matching "{zoek}"{bcolors.ENDC}')
         for f in matching_services:
             print(f[3])
     return None, None, None, None
@@ -62,13 +60,7 @@ def find_matching_services(zoek, use_cache=True):
     matching_services = []
     for s in services:
         for h in s.get("hour_types", []):
-            full_name = (
-                projects[s["project_id"]]
-                + " "
-                + s["name"]
-                + " "
-                + h["hourstype"]["label"]
-            )
+            full_name = projects[s["project_id"]] + " " + s["name"] + " " + h["hourstype"]["label"]
             full_name = full_name.replace("Internal", "").strip()
             if not full_name.lower().count(zoek):
                 continue
@@ -87,7 +79,7 @@ def book(search, amount, note, date: str):
             "project_id": project_id,
             "projectservice_id": service_id,
             "type_id": hourstype_id,
-            "amount": amount,
+            "hours": amount,
             "start_date": date,
             "note": note,
         }
@@ -99,9 +91,7 @@ def book(search, amount, note, date: str):
 
 
 def hours_booked_status(day=datetime.datetime.now()):
-    booked = simplicate().hours_count(
-        {"employee_name": get_employee_name(), "day": day.strftime(DATE_FORMAT)}
-    )
+    booked = simplicate().hours_count({"employee_name": get_employee_name(), "day": day.strftime(DATE_FORMAT)})
 
     weekday = day.weekday()
     if weekday >= 5:  # zo za
@@ -118,9 +108,7 @@ def hours_booked_status(day=datetime.datetime.now()):
 
 
 def hours_booked(day=datetime.datetime.now()):
-    booked = simplicate().hours_simple(
-        {"employee_name": get_employee_name(), "day": day.strftime(DATE_FORMAT)}
-    )
+    booked = simplicate().hours_simple({"employee_name": get_employee_name(), "day": day.strftime(DATE_FORMAT)})
     return [
         {
             "project": b["project_name"],

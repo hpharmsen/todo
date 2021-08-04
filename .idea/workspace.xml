@@ -141,7 +141,7 @@
         </ENTRIES>
       </EXTENSION>
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/todo.py" />
-      <option name="PARAMETERS" value="schedule 1 26/7" />
+      <option name="PARAMETERS" value="done 30m unacc" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -202,9 +202,9 @@
           <option name="timeStamp" value="17" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/todo.py</url>
-          <line>295</line>
-          <option name="timeStamp" value="18" />
+          <url>file://$PROJECT_DIR$/simplicate.py</url>
+          <line>93</line>
+          <option name="timeStamp" value="21" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

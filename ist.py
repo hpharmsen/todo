@@ -44,17 +44,11 @@ class Ist:
             if item["date_completed"]:
                 if item["date_completed"].split("T")[0] < TODAY:
                     continue
-                if (
-                    item["date_completed"].split("T")[0] == TODAY
-                    and not completed_today
-                ):
+                if item["date_completed"].split("T")[0] == TODAY and not completed_today:
                     continue
 
             # Filter out items assigned to someone else, unless assigned by me
-            if (
-                item["responsible_uid"]
-                and item["responsible_uid"] != settings.todoist_user_id
-            ):
+            if item["responsible_uid"] and item["responsible_uid"] != settings.todoist_user_id:
                 by = item["assigned_by_uid"]
                 u = settings.todoist_user_id
                 if item["assigned_by_uid"] == settings.todoist_user_id:
@@ -140,9 +134,7 @@ class Ist:
     def __str__(self):
         projects = defaultdict(list)
         for item in self.items(completed_today=False):
-            marker = (
-                "X" if item["date_completed"] else settings.priorities[item["priority"]]
-            )
+            marker = "X" if item["date_completed"] else settings.priorities[item["priority"]]
             content = item["content"]
             due = " @ " + item["due"]["date"] if item["due"] else ""
             completed = " √ " + item["date_completed"] if item["date_completed"] else ""

@@ -25,11 +25,7 @@ Command = namedtuple("Command", "action itemnumber text timespent task date")
 
 
 def data_files():
-    return [
-        filepath
-        for filepath in datafolder.iterdir()
-        if filepath.is_file() and filepath.suffix == ".txt"
-    ]
+    return [filepath for filepath in datafolder.iterdir() if filepath.is_file() and filepath.suffix == ".txt"]
 
 
 def findText(needle):
@@ -169,8 +165,7 @@ if __name__ == "__main__":
         action = "normal"
 
     # Load the right day
-    if command.date and \
-        action in ["", "add", "del", "dup", "edit", "today", "booked", "note", "log"] + priorityActions:
+    if command.date and action in ["", "add", "del", "dup", "edit", "today", "booked", "note", "log"] + priorityActions:
         day = Day(command.date)
         ist = None
     else:
@@ -234,9 +229,7 @@ if __name__ == "__main__":
                     item.id = ist.add_item(item)
             else:
                 # syntax: todo done 3h overleg
-                item = Item(
-                    ""
-                )  # Special case, only book hours if specified. No todo item.
+                item = Item("")  # Special case, only book hours if specified. No todo item.
 
         if action == "done":
             if item.id and ist:
@@ -357,9 +350,7 @@ if __name__ == "__main__":
         if not command.task:
             panic("Specify project/task. Syntax: todo log Offerte maken 3h Sales")
 
-        if not book(
-            command.task, command.timespent, command.text, day.date.strftime(DATE_FORMAT)
-        ):
+        if not book(command.task, command.timespent, command.text, day.date.strftime(DATE_FORMAT)):
             sys.exit()
         DayAction = 0
 

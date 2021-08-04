@@ -79,9 +79,7 @@ class Day:
     ######### Display ############
 
     def show(self, show_ids=False):
-        print(
-            f"\nTo do's for {weekdays[self.date.weekday()]} {self.date.day} {monthnames[self.date.month-1]}\n"
-        )
+        print(f"\nTo do's for {weekdays[self.date.weekday()]} {self.date.day} {monthnames[self.date.month-1]}\n")
         print(self.asStrings(display="screen", show_ids=show_ids))
 
     def asStrings(self, display="file", show_ids=False):
