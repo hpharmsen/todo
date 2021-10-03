@@ -95,11 +95,11 @@ def parse_commandline():
             action = ""
         else:
             params = sys.argv[2:]
-        try:
-            itemnumber = int(params[0])
-            params = params[1:]
-        except:
-            pass
+        #try:
+        #    itemnumber = int(params[0])
+        #    params = params[1:]
+        #except:
+        #    pass
 
         # Fill command.text with the rest of the command line params
         # unless something special (duration, date) happens
@@ -110,8 +110,12 @@ def parse_commandline():
                 timespent = duration
                 collecting_task = True
                 param = ""
-            if date := isDate(param):  # Date found
-                break
+            if isDate(param):
+                date = isDate(param)# Date found
+                continue
+            if itemnumber is None and param.isdecimal():
+                itemnumber = int(param)
+                continue
             # Param is just text, add it to command.text or command.task depending on where we are
             if collecting_task:
                 task = append(task, param)

@@ -4,6 +4,7 @@ from collections import defaultdict
 import requests
 import todoist
 import settings
+from base import bcolors
 from item import Item
 
 TODAY = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -127,9 +128,12 @@ class Ist:
             else:
                 # No id, must be a new item. Add it to todoist
                 item = self.api.add_item(day_item.desc)
-                self.api.items.update(item["id"], priority=day_item.ist_prio())
-                self.api.commit()
-                day_item.id = item["id"]
+                if error := item.get('error'):
+                    print(bcolors.WARNING + error + bcolors.ENDC)
+                else:
+                    self.api.items.update(item["id"], priority=day_item.ist_prio())
+                    self.api.commit()
+                    day_item.id = item["id"]
 
     def __str__(self):
         projects = defaultdict(list)
