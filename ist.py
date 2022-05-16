@@ -11,15 +11,15 @@ TODAY = datetime.datetime.now().strftime("%Y-%m-%d")
 
 # Hoe het werkt met prioriteiten
 # In todo: ['!','-','~','M','X']
-# 0 = high, 1 = normal, 2 = low, 3 = miek, 4 = done
+# 0 = high, 1 = normal, 2 = low, 3 = other, 4 = done
 #
 # In todoist
-# 1 = low, 2 = miek, 3 = normal, 4 = high
+# 1 = low, 2 = other, 3 = normal, 4 = high
 
 
 def ist2todoprio(prio, date_completed):
     # 1 -> 2 low
-    # 2 -> 3 miek
+    # 2 -> 3 other
     # 3 -> 1 normal
     # 4 -> 0 high
     if date_completed:

@@ -95,11 +95,6 @@ def parse_commandline():
             action = ""
         else:
             params = sys.argv[2:]
-        #try:
-        #    itemnumber = int(params[0])
-        #    params = params[1:]
-        #except:
-        #    pass
 
         # Fill command.text with the rest of the command line params
         # unless something special (duration, date) happens

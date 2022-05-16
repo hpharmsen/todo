@@ -21,7 +21,7 @@ api_key = inifile.get("simplicate", "api_key")
 api_secret = inifile.get("simplicate", "api_secret")
 employee_name = inifile.get("simplicate", "employee_name")
 
-priorities = ["!", "-", "~", "M", "X"]
+priorities = ["!", "-", "~", "O", "X"]
 
 
 def get_employee_id():

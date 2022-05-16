@@ -221,4 +221,4 @@ monthnames = [
     "nov",
     "dec",
 ]
-priorityActions = ["high", "normal", "low", "miek", "done"]
+priorityActions = ["high", "normal", "low", "other", "done"]
