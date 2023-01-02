@@ -34,20 +34,3 @@ def get_employee_id():
 def set_employee_id(id):
     inifile["simplicate"]["employee_id"] = id
 
-
-def getNextDay(date):
-    date += datetime.timedelta(days=1)
-    if date.weekday() == 5:
-        date += datetime.timedelta(days=2)
-    elif date.weekday() == 6:
-        date += datetime.timedelta(days=1)
-    return date
-
-
-def getPrevDay(date):
-    date += datetime.timedelta(days=-1)
-    if date.weekday() == 5:
-        date += datetime.timedelta(days=-1)
-    elif date.weekday() == 6:
-        date += datetime.timedelta(days=-2)
-    return date

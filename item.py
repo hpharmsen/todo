@@ -13,7 +13,8 @@ class Item:
         return Item(self.desc, self.prio, self.id)
 
     def __repr__(self):
-        return f"{priorities[self.prio]} {self.desc}"
+        desc = self.desc.replace('\n', ' ')
+        return f"{priorities[self.prio]} {desc}"
 
     def ist_prio(self):
         # 0 -> 4

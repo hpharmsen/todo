@@ -1,12 +1,12 @@
 import datetime
 import pickle
 from pathlib import Path
+from justdays import Day
 
 from base import bcolors
 from pysimplicate import Simplicate
 
 APRROVED_ID = "approvalstatus:9a4660a21af7234e"
-DATE_FORMAT = "%Y-%m-%d"
 
 _sim = None
 
@@ -71,7 +71,7 @@ def find_matching_services(zoek, use_cache=True):
 
 def book(search, amount, note, date: str):
     if not date:
-        date = datetime.datetime.now().strftime(DATE_FORMAT)
+        date = str(Day())
     project_id, service_id, hourstype_id, full_name = find_bookable(search)
     if project_id:
         postdata = {
@@ -90,25 +90,25 @@ def book(search, amount, note, date: str):
         return res
 
 
-def hours_booked_status(day=datetime.datetime.now()):
-    booked = simplicate().hours_count({"employee_name": get_employee_name(), "day": day.strftime(DATE_FORMAT)})
+def hours_booked_status(day: Day=Day()):
+    booked = simplicate().hours_count({"employee_name": get_employee_name(), "day": str(day)})
 
-    weekday = day.weekday()
+    weekday = day.day_of_week()
     if weekday >= 5:  # zo za
         return ""
-    start_time = datetime.datetime(day.year, day.month, day.day, 9, 30)
+    start_time = datetime.datetime(day.y, day.m, day.d, 9, 30)
     s = "{:0.2f} booked".format(booked)
-    if type(day) == datetime.datetime and day > start_time:
-        lunch = day.hour >= 12 and 30 * 60 or 0
-        time_passed = day - start_time
-        missing = (((time_passed.seconds - lunch) * 4) / 3600 - 4 * booked) / 4.0
-        if missing >= 0.5:
-            s += ", {:0.2f} hours missing".format(missing)
+    # if type(day) == datetime.datetime and day > start_time:
+    #     lunch = day.hour >= 12 and 30 * 60 or 0
+    #     time_passed = day - start_time
+    #     missing = (((time_passed.seconds - lunch) * 4) / 3600 - 4 * booked) / 4.0
+    #     if missing >= 0.5:
+    #         s += ", {:0.2f} hours missing".format(missing)
     return s
 
 
-def hours_booked(day=datetime.datetime.now()):
-    booked = simplicate().hours_simple({"employee_name": get_employee_name(), "day": day.strftime(DATE_FORMAT)})
+def hours_booked(day:Day=Day()):
+    booked = simplicate().hours_simple({"employee_name": get_employee_name(), "day": str(day)})
     return [
         {
             "project": b["project_name"],
@@ -120,19 +120,19 @@ def hours_booked(day=datetime.datetime.now()):
     ]
 
 
-def approve_hours(day=None):
+def approve_hours(day:Day=None):
     if not day:
-        day = datetime.datetime.today()
+        day = Day()
     filter = {
         "employee_id": get_employee_id(),
         "approvalstatus_id": APRROVED_ID,
-        "date": day.strftime(DATE_FORMAT),
+        "date": str(day),
     }
     res = simplicate().hours_approval(filter)
     return res
 
 
-def printHoursBooked(day):
+def printHoursBooked(day:Day):
     booked = {}
     for item in hours_booked(day):
         key = f"{item['project']}, {item['task']}"

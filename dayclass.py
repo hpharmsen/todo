@@ -1,26 +1,24 @@
-import datetime
-
 from item import Item
-from settings import datafolder, priorities, getNextDay, getPrevDay
-from base import panic, bcolors
+from settings import datafolder, priorities
+from base import bcolors
+from justdays import Day, Period
 
-
-class Day:
+class TodoDay:
     items = []  # List of Item
     notedata = ""
-    date = datetime.date.today()
+    date = Day()
     originaltext = ""
 
     ######### Construction, read and write ############
 
-    def __init__(self, date=datetime.date.today()):
+    def __init__(self, date=Day()):
         self.date = date
         self.items = []
         self.notedata = ""
         self.originaltext = ""
         self._dailyNotesBook = None
 
-        self.path = datafolder / f'{self.date.strftime("%Y-%m-%d")}.txt'
+        self.path = datafolder / f'{self.date}.txt'
 
         self.read()
 
@@ -79,7 +77,7 @@ class Day:
     ######### Display ############
 
     def show(self, show_ids=False):
-        print(f"\nTo do's for {weekdays[self.date.weekday()]} {self.date.day} {monthnames[self.date.month-1]}\n")
+        print(f"\nTo do's for {weekdays[self.date.day_of_week()]} {self.date.d} {monthnames[self.date.m-1]}\n")
         print(self.asStrings(display="screen", show_ids=show_ids))
 
     def asStrings(self, display="file", show_ids=False):
@@ -135,7 +133,7 @@ class Day:
     def pushForward(self, num):
         item = self.items[num - 1]
         id = item.id
-        tomorrow = Day(getNextDay(self.date))
+        tomorrow = TodoDay(self.date.next_weekday())
         tomorrow.add(item.dup())
         tomorrow.write()
         self.delete(num)
@@ -145,14 +143,14 @@ class Day:
         item = self.items[num - 1]
         id = item.id
         new_item = Item(item.desc, 4)  # 4 is done
-        yesterday = Day(getPrevDay(self.date))
+        yesterday = TodoDay(self.date.prev_weekday())
         yesterday.add(new_item)
         yesterday.write()
         self.delete(num)
         return id
 
     def pushAllForward(self):
-        tomorrow = Day(getNextDay(self.date))
+        tomorrow = TodoDay(self.date.next_weekday())
         for item in reversed(self.items):
             if item.prio < 4:
                 tomorrow.add(item.dup())
@@ -160,20 +158,17 @@ class Day:
         tomorrow.write()
 
     def pullFromLast(self, num):
-        lastday = Day(getPrevDay(self.date))
+        lastday = TodoDay(self.date.prev_weekday())
         self.add(lastday.items[num - 1].dup())
         lastday.delete(num)
         lastday.write()
 
     def pullAll(self):
-        changed = False
-        date = self.date
-        for days in range(10):
-            date = getPrevDay(date)
-            changed = self.pullFromDay(date) or changed
+        for date in Period(self.date.plus_days(-1), self.date):
+            self.pullFromDay(date)
 
     def pullFromDay(self, date):
-        lastday = Day(date)
+        lastday = TodoDay(date)
         changed = 0
         for item in reversed(lastday.items):
             if item.prio < 4:
@@ -185,7 +180,7 @@ class Day:
         return changed
 
     def schedule(self, desc, date):
-        day = Day(date)
+        day = TodoDay(date)
         item = day.add(desc)
         day.write()
         return item, date
@@ -193,7 +188,7 @@ class Day:
     def reschedule(self, num, date):
         item = self.items[num - 1]
         id = item.id
-        day = Day(date)
+        day = TodoDay(date)
         day.add(item.dup())
         day.write()
         self.delete(num)

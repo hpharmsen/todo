@@ -162,7 +162,10 @@ class Ist:
         new = self.api.add_item(item.desc, priority=item.ist_prio())
         self.api.commit()
         if new:
-            return new["id"]
+            if type(new) == str:
+                print(new)
+            else:
+                return new["id"]
 
     def complete_item(self, id):
         date_completed = datetime.datetime.today().strftime("%Y-%m-%d")

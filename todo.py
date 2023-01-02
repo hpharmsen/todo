@@ -6,8 +6,8 @@ from collections import namedtuple
 # - assign to specific person
 # - Do not sync items from shared todoist projects that are not assigned to me nor assigned by me
 
-from dayclass import Day, datafolder, priorityActions
-from settings import getNextDay, getPrevDay, todoist_api_key
+from dayclass import TodoDay, datafolder, priorityActions
+from settings import todoist_api_key
 from base import panic, extractDuration, isDate
 
 if todoist_api_key:
@@ -17,8 +17,8 @@ from simplicate import (
     book,
     hours_booked_status,
     approve_hours,
-    printHoursBooked,
-    DATE_FORMAT,
+    printHoursBooked
+
 )
 
 Command = namedtuple("Command", "action itemnumber text timespent task date")
@@ -165,10 +165,10 @@ if __name__ == "__main__":
 
     # Load the right day
     if command.date and action in ["", "add", "del", "dup", "edit", "today", "booked", "note", "log"] + priorityActions:
-        day = Day(command.date)
+        day = TodoDay(command.date)
         ist = None
     else:
-        day = Day()
+        day = TodoDay()
         day.pullAll()
         ist = get_todoist(day)
 
@@ -178,7 +178,7 @@ if __name__ == "__main__":
 
     if not action:  # Just a listing
         if command.date:
-            day = Day(command.date)
+            day = TodoDay(command.date)
             ist = None
 
     elif action == "add":
@@ -204,7 +204,7 @@ if __name__ == "__main__":
 
     elif action in priorityActions:
         if command.date:
-            day = Day(command.date)
+            day = TodoDay(command.date)
             ist = None
         prio = priorityActions.index(action)
         if command.itemnumber:
@@ -245,7 +245,7 @@ if __name__ == "__main__":
                     command.task,
                     command.timespent,
                     item.desc,
-                    day.date.strftime(DATE_FORMAT),
+                    str(day),
                 ):
                     # Set back the prio to what it was
                     if command.itemnumber == None:
@@ -296,10 +296,10 @@ if __name__ == "__main__":
                 ist.reschedule(item.id, date)
 
     elif action == "next":
-        day = Day(getNextDay(day.date))
+        day = TodoDay(day.date.previous_weekday())
 
     elif action == "last":
-        day = Day(getPrevDay(day.date))
+        day = TodoDay(day.date.next_weekday())
 
     elif action == "edit":
         if not command.itemnumber:
@@ -349,7 +349,7 @@ if __name__ == "__main__":
         if not command.task:
             panic("Specify project/task. Syntax: todo log Offerte maken 3h Sales")
 
-        if not book(command.task, command.timespent, command.text, day.date.strftime(DATE_FORMAT)):
+        if not book(command.task, command.timespent, command.text, str(day)):
             sys.exit()
         DayAction = 0
 

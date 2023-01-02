@@ -152,7 +152,7 @@
         <option name="useCurrentConnection" value="false" />
       </EXTENSION>
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/todo.py" />
-      <option name="PARAMETERS" value="done Call met Wouter 45m hrm" />
+      <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -208,7 +208,7 @@
       <breakpoints>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/dayclass.py</url>
-          <line>109</line>
+          <line>107</line>
           <option name="timeStamp" value="17" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
@@ -225,11 +225,6 @@
           <url>file://$PROJECT_DIR$/venv/lib/python3.9/site-packages/pysimplicate/_hours.py</url>
           <line>70</line>
           <option name="timeStamp" value="25" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/venv/src/pysimplicate/pysimplicate/_hours.py</url>
-          <line>71</line>
-          <option name="timeStamp" value="26" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
