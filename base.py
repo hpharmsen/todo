@@ -1,7 +1,7 @@
 import re
 import sys
 from datetime import datetime
-
+from justdays import Day
 
 def panic(s):
     print(bcolors.FAIL + s + bcolors.ENDC)
@@ -43,5 +43,5 @@ def isDate(s):
         y = datetime.now().strftime("%Y")
     else:
         return None
-    day = datetime(int(y), int(m), int(d))
+    day = Day(int(y), int(m), int(d))
     return day
