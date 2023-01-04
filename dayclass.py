@@ -143,7 +143,7 @@ class TodoDay:
         item = self.items[num - 1]
         id = item.id
         new_item = Item(item.desc, 4)  # 4 is done
-        yesterday = TodoDay(self.date.prev_weekday())
+        yesterday = TodoDay(self.date.previous_weekday())
         yesterday.add(new_item)
         yesterday.write()
         self.delete(num)
@@ -158,7 +158,7 @@ class TodoDay:
         tomorrow.write()
 
     def pullFromLast(self, num):
-        lastday = TodoDay(self.date.prev_weekday())
+        lastday = TodoDay(self.date.previous_weekday())
         self.add(lastday.items[num - 1].dup())
         lastday.delete(num)
         lastday.write()

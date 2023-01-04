@@ -2,7 +2,8 @@ import datetime
 from collections import defaultdict
 
 import requests
-import todoist
+#import todoist OLD
+from todoist_api_python.api import TodoistAPI
 import settings
 from base import bcolors
 from item import Item
@@ -30,11 +31,11 @@ def ist2todoprio(prio, date_completed):
 
 class Ist:
     def __init__(self):
-        self.api = todoist.TodoistAPI(settings.todoist_api_key)
-        try:
-            self.api.sync()
-        except requests.exceptions.ConnectionError:
-            return None  # Network
+        self.api = TodoistAPI(settings.todoist_api_key)
+        # try:
+        #     self.api.sync()
+        # except requests.exceptions.ConnectionError:
+        #     return None  # Network
         self.projects = self.get_projects()
 
     def items(self, project=None, scheduled=False, deleted=False, completed_today=True):

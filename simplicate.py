@@ -69,9 +69,9 @@ def find_matching_services(zoek, use_cache=True):
     return res
 
 
-def book(search, amount, note, date: str):
+def book(search, amount, note, date: Day):
     if not date:
-        date = str(Day())
+        date = Day()
     project_id, service_id, hourstype_id, full_name = find_bookable(search)
     if project_id:
         postdata = {
@@ -80,7 +80,7 @@ def book(search, amount, note, date: str):
             "projectservice_id": service_id,
             "type_id": hourstype_id,
             "hours": amount,
-            "start_date": date,
+            "start_date": str(date),
             "note": note,
         }
         res = simplicate().book_hours(postdata)

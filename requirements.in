@@ -2,7 +2,7 @@ PyMySQL
 PyYAML
 requests
 typing
-todoist-python
+todoist-api-python
 justdays
 -e git+https://github.com/hpharmsen/hplib#egg=hplib
 -e git+https://github.com/hpharmsen/pysimplicate#egg=pysimplicate

@@ -245,7 +245,7 @@ if __name__ == "__main__":
                     command.task,
                     command.timespent,
                     item.desc,
-                    str(day),
+                    day.date,
                 ):
                     # Set back the prio to what it was
                     if command.itemnumber == None:

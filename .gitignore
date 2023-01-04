@@ -132,3 +132,4 @@ dmypy.json
 .pyre/
 .idea/aws.xml
 .servicescache
+.idea/workspace.xml
