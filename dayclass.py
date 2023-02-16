@@ -164,7 +164,7 @@ class TodoDay:
         lastday.write()
 
     def pullAll(self):
-        for date in Period(self.date.plus_days(-1), self.date):
+        for date in Period(self.date.plus_days(-8), self.date):
             self.pullFromDay(date)
 
     def pullFromDay(self, date):

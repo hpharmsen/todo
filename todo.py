@@ -295,10 +295,10 @@ if __name__ == "__main__":
                 item.id = ist.add_item(item)
                 ist.reschedule(item.id, date)
 
-    elif action == "next":
+    elif action == "last":
         day = TodoDay(day.date.previous_weekday())
 
-    elif action == "last":
+    elif action == "next":
         day = TodoDay(day.date.next_weekday())
 
     elif action == "edit":

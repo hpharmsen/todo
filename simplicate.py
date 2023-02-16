@@ -17,6 +17,9 @@ def simplicate():
         import settings
 
         _sim = Simplicate(settings.subdomain, settings.api_key, settings.api_secret)
+        res = _sim.call('/crm/organization') # Test if connection is OK
+        if not res:
+            _sim = None
     return _sim
 
 
@@ -47,15 +50,18 @@ def find_matching_services(zoek, use_cache=True):
         with open(cache_file, "rb") as f:
             projects, services = pickle.load(f)
     else:
-        projects = {p["id"]: p["name"] for p in simplicate().project({"active": True})}
-        services = [
-            s
-            for s in simplicate().service({"status": "open", "track_hours": True})
-            if s.get("name") and s["project_id"] in projects.keys()
-        ]
-        with open(cache_file, "wb") as f:
-            pickle.dump((projects, services), f)
-
+        sim = simplicate()
+        if sim:
+            projects = {p["id"]: p["name"] for p in sim.project({"active": True})}
+            services = [
+                s
+                for s in simplicate().service({"status": "open", "track_hours": True})
+                if s.get("name") and s["project_id"] in projects.keys()
+            ]
+            with open(cache_file, "wb") as f:
+                pickle.dump((projects, services), f)
+        else:
+            services = []
     res = []
     matching_services = []
     for s in services:
@@ -83,7 +89,11 @@ def book(search, amount, note, date: Day):
             "start_date": str(date),
             "note": note,
         }
-        res = simplicate().book_hours(postdata)
+        sim = simplicate()
+        if not sim:
+            print(f"{bcolors.FAIL}Could not connect to Simplicate.{bcolors.ENDC}")
+            return None
+        res = sim.book_hours(postdata)
         howmuch = f"{amount:.1f} hours" if amount >= 1 else f"{amount*60:.0f} minutes"
 
         print(f"{bcolors.GREEN}Booked {howmuch} on {full_name}.{bcolors.ENDC}")
@@ -91,7 +101,10 @@ def book(search, amount, note, date: Day):
 
 
 def hours_booked_status(day: Day=Day()):
-    booked = simplicate().hours_count({"employee_name": get_employee_name(), "day": str(day)})
+    sim = simplicate()
+    if not sim:
+        return ""
+    booked = sim.hours_count({"employee_name": get_employee_name(), "day": str(day)})
 
     weekday = day.day_of_week()
     if weekday >= 5:  # zo za
@@ -108,7 +121,10 @@ def hours_booked_status(day: Day=Day()):
 
 
 def hours_booked(day:Day=Day()):
-    booked = simplicate().hours_simple({"employee_name": get_employee_name(), "day": str(day)})
+    sim = simplicate()
+    if not sim:
+        return []
+    booked = sim.hours_simple({"employee_name": get_employee_name(), "day": str(day)})
     return [
         {
             "project": b["project_name"],
@@ -128,7 +144,11 @@ def approve_hours(day:Day=None):
         "approvalstatus_id": APRROVED_ID,
         "date": str(day),
     }
-    res = simplicate().hours_approval(filter)
+    sim = simplicate()
+    if not sim:
+        print(f"{bcolors.FAIL}Could not connect to Simplicate.{bcolors.ENDC}")
+        return None
+    res = sim.hours_approval(filter)
     return res
 
 
@@ -171,7 +191,10 @@ def get_employee_id():
 
         _employee_id = settings.get_employee_id()
         if not _employee_id:
-            emp = simplicate().employee({"name": get_employee_name()})
+            sim = simplicate()
+            if not sim:
+                return None
+            emp = sim.employee({"name": get_employee_name()})
             _employee_id = emp["id"]
     return _employee_id
 
