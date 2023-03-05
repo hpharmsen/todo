@@ -2,6 +2,8 @@ from dataclasses import dataclass
 
 from settings import priorities
 
+PRIORITY_MAP = {0: 1, 1: 1, 2: 3, 3: 2, 4: 0}
+REVERSE_PRIORITY_MAP = {1: 0, 2: 3, 3: 2, 0: 4}
 
 @dataclass()
 class Item:
@@ -22,4 +24,4 @@ class Item:
         # 2 -> 1
         # 3 -> 2 and Assign to someone else
         # 4 -> Set to done
-        return {0: 4, 1: 3, 2: 1, 3: 2, 4: 4}[self.prio]
+        return REVERSE_PRIORITY_MAP[self.prio]

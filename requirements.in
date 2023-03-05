@@ -1,7 +1,6 @@
 PyMySQL
 PyYAML
 requests
-typing
 todoist-api-python
 justdays
 -e git+https://github.com/hpharmsen/hplib#egg=hplib

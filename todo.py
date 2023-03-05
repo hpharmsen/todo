@@ -123,7 +123,6 @@ def get_todoist(day):
     ist = None
     if todoist_api_key:
         ist = Ist()
-        ist.sync(day)
     return ist
 
 
@@ -156,22 +155,7 @@ def printHelp():
     print("todo ids                    - shows the list with todoist id's")
     print("todo help                   - this message\n")
 
-
-if __name__ == "__main__":
-    command = parse_commandline()
-    action = command.action
-    if action == "undone":
-        action = "normal"
-
-    # Load the right day
-    if command.date and action in ["", "add", "del", "dup", "edit", "today", "booked", "note", "log"] + priorityActions:
-        day = TodoDay(command.date)
-        ist = None
-    else:
-        day = TodoDay()
-        day.pullAll()
-        ist = get_todoist(day)
-
+def process_command(day:TodoDay, command:Command, ist: Ist):
     # Go process the command
     DayAction = True
     show_ids = False
@@ -356,7 +340,28 @@ if __name__ == "__main__":
     else:
         panic("Unknown action: " + action)
 
-    if DayAction:
+    return DayAction, show_ids
+
+
+if __name__ == "__main__":
+    command = parse_commandline()
+    action = command.action
+    if action == "undone":
+        action = "normal"
+
+    # Load the right day
+    if command.date and action in ["", "add", "del", "dup", "edit", "today", "booked", "note", "log"] + priorityActions:
+        day = TodoDay(command.date)
+        #ist = None
+    else:
+        day = TodoDay()
+        day.pullAll()
+    ist = get_todoist(day)
+
+    # Handle the action
+    day_action, show_ids = process_command(day, command, ist)
+    if day_action:
+        ist.sync(day)
         day.reorder()
         day.show(show_ids)
         if day.originaltext != day.asText():

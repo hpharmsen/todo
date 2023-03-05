@@ -1,12 +1,13 @@
 import datetime
 from collections import defaultdict
+#from typing import List
 
-import requests
-#import todoist OLD
 from todoist_api_python.api import TodoistAPI
+from todoist_api_python.models import Task
+
 import settings
-from base import bcolors
-from item import Item
+from dayclass import TodoDay
+from item import Item, PRIORITY_MAP
 
 TODAY = datetime.datetime.now().strftime("%Y-%m-%d")
 
@@ -15,18 +16,18 @@ TODAY = datetime.datetime.now().strftime("%Y-%m-%d")
 # 0 = high, 1 = normal, 2 = low, 3 = other, 4 = done
 #
 # In todoist
-# 1 = low, 2 = other, 3 = normal, 4 = high
+# p1 = low, p2 = other, p3 = normal, p4 = high
 
+def ist2todoprio(prio: int, is_completed: bool):
+    # p4 = 1 -> 1 normal
+    # p3 = 2 -> 3 other
+    # p2 = 3 -> 2 low
+    # p1 = 4 -> 0 high
 
-def ist2todoprio(prio, date_completed):
-    # 1 -> 2 low
-    # 2 -> 3 other
-    # 3 -> 1 normal
-    # 4 -> 0 high
-    if date_completed:
+    if is_completed:
         return 4  # done
     else:
-        return {0: 1, 1: 2, 2: 3, 3: 1, 4: 0}[prio]
+        return PRIORITY_MAP[prio]
 
 
 class Ist:
@@ -38,58 +39,62 @@ class Ist:
         #     return None  # Network
         self.projects = self.get_projects()
 
-    def items(self, project=None, scheduled=False, deleted=False, completed_today=True):
-        items = []
-        for item in self.api["items"]:
+
+    def tasks(self, project: object = None, scheduled: object = False, deleted: object = False,
+              completed_today: object = True) -> list[Task]:
+        result = []
+        for task in self.api.get_tasks():
 
             # Filter out completed items
-            if item["date_completed"]:
-                if item["date_completed"].split("T")[0] < TODAY:
-                    continue
-                if item["date_completed"].split("T")[0] == TODAY and not completed_today:
-                    continue
+            if task.is_completed:
+                continue
+            # if item["date_completed"]:
+            #     if item["date_completed"].split("T")[0] < TODAY:
+            #         continue
+            #     if item["date_completed"].split("T")[0] == TODAY and not completed_today:
+            #         continue
 
             # Filter out items assigned to someone else, unless assigned by me
-            if item["responsible_uid"] and item["responsible_uid"] != settings.todoist_user_id:
-                by = item["assigned_by_uid"]
+            if task.assignee_id and task.assignee_id != settings.todoist_user_id:
+                by = task.assigner_id
                 u = settings.todoist_user_id
-                if item["assigned_by_uid"] == settings.todoist_user_id:
-                    item["priority"] = 2  # Blauw
+                if task.assigner_id == settings.todoist_user_id:
+                    task.priority = 2  # Blauw
                 else:
                     continue
 
             # Filter out items from shared projects that are not assigned to nor assigned by me
 
-            own_projects = [p["id"] for p in self.projects if not p["shared"]]
+            own_projects = [p.id for p in self.projects if not p.is_shared]
             if (
-                not item["project_id"] in own_projects
-                and item["responsible_uid"] != settings.todoist_user_id
-                and item["assigned_by_uid"] != settings.todoist_user_id
+                not task.project_id in own_projects
+                and task.assignee_id != settings.todoist_user_id
+                and task.assigner_id != settings.todoist_user_id
             ):
                 continue
 
             # If specified filter out all items not belonging to the project.
-            if project and item["project_id"] != project.id:
+            if project and task.project_id != project.id:
                 continue
 
             # Filter out deleted items
-            if not deleted and item["is_deleted"]:
-                continue
+            #if not deleted and item["is_deleted"]:
+            #    continue
 
             # Filter out items scheduled for a later time
-            if not scheduled and item["due"] and item["due"]["date"] > TODAY:
+            if not scheduled and task.due and task.due.date > TODAY:
                 continue
 
-            items += [item]
+            result += [task]
 
-        return items
+        return result
 
     def get_projects(self):
-        return self.api.state["projects"]
+        return self.api.get_projects()
 
     def project_by_name(self, project_name):
         for project in self.projects:
-            if project["name"] == project_name:
+            if project.name == project_name:
                 return project
 
     def project_by_id(self, project_id):
@@ -97,115 +102,93 @@ class Ist:
             if project.id == project_id:
                 return project
 
-    def sync(self, day):
-        day_dict = day.by_id()
-        todoist_items = self.items(deleted=True, scheduled=False, completed_today=True)
-        todoist_ids = set()
-        for todoist_item in todoist_items:
-            title = todoist_item.data["content"]
-            prio = ist2todoprio(
-                todoist_item.data["priority"],
-                todoist_item.data["date_completed"],
-            )
-            id = todoist_item.data["id"]
-            if id == 4369327690:
-                continue  # Ghost id that cannot be found or deleted in todoist
-            todoist_ids.add(id)
-            day_item = day_dict.get(id)
-            if not day_item:
-                # todoist item not found in day. Add it
-                day_item = day.add(Item(title, prio, id))
-            # Update if Todoist item appears to have changed
-            if day_item.prio != prio:
-                day_item.prio = prio
-            if day_item.desc != title:
-                day_item.desc = title
-
+    def sync(self, day: TodoDay):
+        """ Sync runt na evt actie zoals het toevoegen of verwijderen van items.
+        Sync doet twee dingen:
+        1. Check of er items in day staan die niet in todoist staan, zo ja, verwijder ze uit day
+        2. Loop de items in todoist door, update day waar nodig of voeg zelfs toe aan day
+        """
+        todoist_tasks = self.tasks(deleted=True, scheduled=False, completed_today=True)
+        todoist_by_title = {task.content: task for task in todoist_tasks}
         for day_item in day.items:
-            if day_item.id:
-                if not day_item.id in todoist_ids:
-                    # Item has an id so used to be in todoist but isn't there anymore. Delete it.
-                    day.items.remove(day_item)
+            todoist_task = todoist_by_title.get(day_item.desc)
+            if not todoist_task:
+                # Item not found in todoist. Delete it.
+                print("    ", day_item.desc, "not found in todoist. Deleting it.")
+                day.items.remove(day_item)
+
+        day_items_by_title = {item.desc: item for item in day.items}
+        for todoist_task in todoist_tasks:
+            prio = ist2todoprio(todoist_task.priority, todoist_task.is_completed)
+            day_item = day_items_by_title.get(todoist_task.content)
+            if day_item:
+                if day_item.prio != prio:
+                    # Todoist item appears to have changed: update
+                    print("    ", todoist_task.content, "changed prio in todoist. Updating it.")
+                    day_item.prio = prio
             else:
-                # No id, must be a new item. Add it to todoist
-                item = self.api.add_item(day_item.desc)
-                if error := item.get('error'):
-                    print(bcolors.WARNING + error + bcolors.ENDC)
-                else:
-                    self.api.items.update(item["id"], priority=day_item.ist_prio())
-                    self.api.commit()
-                    day_item.id = item["id"]
+                # Todoist item not found in day. Add it
+                day_item = day.add(Item(todoist_task.content, prio, todoist_task.id))
+                print("    ", todoist_task.content, "not found in day. Adding it.")
+
 
     def __str__(self):
         projects = defaultdict(list)
-        for item in self.items(completed_today=False):
-            marker = "X" if item["date_completed"] else settings.priorities[item["priority"]]
-            content = item["content"]
-            due = " @ " + item["due"]["date"] if item["due"] else ""
-            completed = " √ " + item["date_completed"] if item["date_completed"] else ""
-            deleted = " DELETED" if item["is_deleted"] else ""
-            string = marker + " " + content + due + completed + deleted
+        for task in self.tasks(completed_today=False):
+            marker = "X" if task.is_completed else settings.priorities[task.priority]
+            content = task.content
+            due = " @ " + task.due.date if task.due else ""
+            completed = " √ " if task.is_completed else ""
+            string = marker + " " + content + due + completed
 
-            project_id = item.data["project_id"]
-            project_name = self.project_by_id(project_id)["name"]
+            project_id = task.project_id
+            project_name = self.project_by_id(project_id).name
             projects[project_name].append(string)
         res = ""
         for project, items in projects.items():
             res += project + "\n"
-            for item in items:
-                res += "   " + item + "\n"
+            for task in items:
+                res += "   " + task + "\n"
         return res
 
     ### ACTIONS ###
 
     def add_item(self, item):
         i = item.ist_prio()
-        new = self.api.add_item(item.desc, priority=item.ist_prio())
-        self.api.commit()
+        new = self.api.add_task(item.desc, priority=item.ist_prio())
+        #self.api.commit()
         if new:
             if type(new) == str:
                 print(new)
             else:
-                return new["id"]
+                return new.id
 
     def complete_item(self, id):
-        date_completed = datetime.datetime.today().strftime("%Y-%m-%d")
-
-        self.api.items.complete(id, date_completed=date_completed)
-        self.api.items.archive(id)
-        self.api.commit()
+        self.api.close_task(id)
 
     def delete_item(self, id):
-        self.api.items.delete(id)
-        self.api.commit()
+        self.api.delete_task(id)
 
     def edit_item(self, id, new_text):
-        self.api.items.update(id, content=new_text)
-        self.api.commit()
+        self.api.update_task(id, content=new_text)
 
     def set_priority(self, id, priority):
-        self.api.items.update(id, priority=priority)
-        self.api.commit()
+        self.api.update_task(id, priority=priority)
 
     def push_forward(self, id):
-        due = {"string": "tomorrow"}
-        self.api.items.update(id, due=due)
-        self.api.commit()
+        self.api.update_task(id, due_string="tomorrow")
 
     def push_back(self, id):
-        prev_day = settings.getPrevDay(datetime.datetime.today()).strftime("%Y-%m-%d")
-        self.api.items.complete(id, date_completed=prev_day)
-        self.api.commit()
+        #prev_day = settings.getPrevDay(datetime.datetime.today()).strftime("%Y-%m-%d")
+        self.api.close_task(id)
 
     def reschedule(self, id, date):
-        due = {"string": date}
-        self.api.items.update(id, due=due)
-        self.api.commit()
+        self.api.update_task(id, due_date=date)
 
 
 if __name__ == "__main__":
     ist = Ist()
     inbox_project = ist.project_by_name("Inbox")
-    inbox_items = ist.items(inbox_project)
+    inbox_items = ist.tasks(inbox_project)
     for item in inbox_items:
         print(item)
